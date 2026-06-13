@@ -7,3 +7,73 @@
 # I'll fill this out later
 
 
+!/zzWIP/
+
+/zzAJ/
+
+.env
+
+# Composer dependencies
+/vendor/
+
+# Composer PHAR
+/composer.phar
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Logs and cache
+/storage/logs/
+/storage/framework/cache/
+/storage/framework/sessions/
+storage/debugbar/   # if using Laravel Debugbar
+
+# PHPUnit
+/phpunit.xml
+/phpunit.xml.dist
+/phpunit.result.cache
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# IDEs and editors
+.vscode/
+*.sublime-workspace
+*.sublime-project
+
+# Node modules (if using npm/yarn for frontend assets)
+node_modules/
+
+# Build directories (if any)
+public/build/
+public/hot
+
+# Laravel specific
+/bootstrap/cache/*.php
+
+# Ignore compiled templates (Twig, Plates, Blade caches if applicable)
+storage/framework/views/
+
+# Ignore coverage reports
+coverage/
+coverage.xml
+
+# Ignore system files
+*.log
+
+# Ignore deployment files
+.env.backup
+.env.production
+
+# Ignore other common files
+*.cache
+*.bak
+*.tmp
+
+# Ignore generated files by IDEs or tools
+*.iml
+*.swp
+
