@@ -1,0 +1,211 @@
+
+JAVADIO × KLUTCH KANTENT
+
+Algorithmic ThinkingStudy Plan
+Levelling Up for Real-World Engineering
+AJ  ·  April 2026
+
+This is not a LeetCode grind guide.
+Every concept here maps directly to something you are already building — ETL pipelines, file systems, music platforms, recommendation engines, and producer tools.
+ The Three Questions
+Before reaching for any algorithm or data structure, ask these in order:
+1  What shape is my data?  — Array, hash map, tree, graph, queue, stream, set
+2  What do I need to do to it?  — Search, sort, transform, aggregate, traverse, deduplicate
+3  What does it cost?  — Time complexity (speed) and space complexity (memory)
+Everything else is pattern recognition on top of those three. The goal of this plan is to wire those patterns into your thinking so they become instinct.
+
+Big O — The Vocabulary of Cost
+Notation	Name	Intuition	Example
+O(1)	Constant	Always same cost	Hash map lookup (your SHA-256 dedup check)
+O(log n)	Logarithmic	Halves problem each step	Binary search on sorted track IDs
+O(n)	Linear	Visit each item once	Scan all files in an ETL import
+O(n log n)	Log-linear	Sort then scan	Mergesort — track ordering, playlist ranking
+O(n²)	Quadratic	Nested loops — avoid at scale	Naive duplicate detection without hashing
+O(2ⁿ)	Exponential	Explore all combinations	Brute-force recommendation permutations
+ Pattern 1 — Hash Maps & Frequency Tables
+CORE IDEA: Store once (O(1) write), look up instantly (O(1) read). Trade memory for speed.
+The Pattern
+// Problem: find duplicates in an array — naive = O(n²)
+// Hash map approach = O(n)
+
+$seen = [];
+foreach ($items as $item) {
+    if (isset($seen[$item])) {
+        // duplicate found — O(1) lookup
+    }
+    $seen[$item] = true;  // O(1) write
+}
+Where This Lives in Your Code Right Now
+Location	How hash maps are already at work
+FileService::upload()	findByHash($sha256) — O(1) dedup check before writing to disk
+ETL Taxonomy Loader	Normalize genre/mood/tag names: $map[$rawName] = $canonicalId
+JUMANJI Shuffler	Track pool indexed by category for O(1) random pick by type
+Klutch Kantent CMS	Config values in $config[] — global hash map lookup throughout
+
+Exercises — do these in PHP or Python
+•	Two Sum: given array $nums and target, return indices of two numbers that add up to target. Solve in O(n) using a hash map.
+•	Frequency count: given an array of genre strings from your TFN XML import, count how many tracks belong to each genre. Return sorted by count descending.
+•	Anagram grouping: given a list of track titles, group those that are anagrams of each other (useful for finding mislabelled duplicates in a music library).
+•	YOUR PROJECT TASK — ETL dedup: write a PHP function that takes an array of raw file paths, hashes each with SHA-256, and returns only unique files. Compare runtime of hash map vs. nested loop approach on 10k files.
+ Pattern 2 — Sliding Window & Two Pointers
+CORE IDEA: Process a "window" of elements by moving two pointers instead of re-scanning from scratch. Turns O(n²) into O(n).2
+The Pattern
+// Max sum of k consecutive elements — naive: O(n*k)
+// Sliding window: O(n)
+
+function maxWindowSum(array $arr, int $k): int {
+    $windowSum = array_sum(array_slice($arr, 0, $k));
+    $maxSum = $windowSum;
+    for ($i = $k; $i < count($arr); $i++) {
+        $windowSum += $arr[$i] - $arr[$i - $k]; // slide: add right, drop left
+        $maxSum = max($maxSum, $windowSum);
+    }
+    return $maxSum;
+}
+Where This Pattern Applies in Your Work
+Use case	Window = ?	Why it matters
+Audio waveform analysis	N samples	Find loudest N-ms segment without re-summing
+Log stream processing	N log lines	Detect error bursts in a rolling time window
+CSV chunk uploads (ETL)	N rows	Process large files in fixed memory regardless of file size
+JUMANJI recent-plays filter	Last N tracks	Avoid repeating recently played tracks
+Rate limiting in Kernel.php	N requests	Count requests in a sliding time window for API throttling
+
+Exercises
+•	Longest substring without repeating characters — classic sliding window. Then apply it: find the longest run of unique track titles in a playlist.
+•	Given an array of audio levels (integers), find the maximum average loudness over any window of k samples.
+•	YOUR PROJECT TASK — chunked ETL reader: write a PHP generator that yields chunks of N rows from a large CSV (like the TFN music collection) using a sliding window so memory stays flat.
+ Pattern 3 — Recursion & Tree Traversal
+CORE IDEA: A recursive function calls itself on a smaller version of the same problem until it hits a base case. Trees are just nested recursive structures.
+The Template (memorize this shape)
+function solve($problem) {
+    // 1. BASE CASE — stop recursion
+    if (isSmallEnough($problem)) {
+        return directAnswer($problem);
+    }
+    // 2. RECURSIVE CASE — shrink the problem
+    $smaller = shrink($problem);
+    return combine(solve($smaller));
+}
+Where This Pattern Lives in Your Work
+Use case	Tree structure	Traversal type
+Ableton project folder scan	Nested directories / files	DFS — depth-first, pre-order
+TFN_MUSIC_COLLECTION.xml import	XML element hierarchy	DFS — recursive element parsing
+CMS nested categories	Parent → child taxonomy
+DFS or BFS depending on render need
+JAOS folder organization	Project > Stems > Samples > Clips	DFS — walk and rename/recolor
+File versioning chain	parent_id linked list / tree	Tail recursion or iterative walk
+
+Exercises
+•	Write a recursive PHP function that calculates the total size of a directory tree (sum of all file sizes). Base case: file (return its size). Recursive case: directory (sum children).
+•	Parse the TFN XML collection recursively — each <track> node has child <genre>, <mood>, <instrument> nodes. Write a recursive extractor that builds a nested PHP array.
+•	Flatten a nested taxonomy array into a flat list with full path strings: ["Electronic > House > Deep House", "Electronic > Techno", ...].
+•	YOUR PROJECT TASK — JAOS scanner: write a PHP CLI script that recursively walks an Ableton project folder, identifies files by extension (.als, .wav, .mid, .asd), and outputs a JSON manifest with path, size, hash, and type.
+ Pattern 4 — Graph Traversal (BFS & DFS)
+CORE IDEA: A graph is any set of nodes connected by edges. BFS finds the shortest path. DFS explores all possibilities. Most "relation" problems are graphs in disguise.
+BFS vs DFS — When to Use Which
+	BFS	DFS
+Data structure	Queue (FIFO)	Stack or recursion
+Finds	Shortest path	All paths / deep exploration
+Memory	Wide — keeps level	Deep — keeps one path
+Your use case	"What producers are within 2 hops of AJ?"	"What is every possible collaboration path?"
+Producer Collaboration Graph Example
+// BFS: find all producers reachable within $maxHops from $startId
+function bfsProducers(array $graph, int $startId, int $maxHops): array {
+    $queue   = [[$startId, 0]];  // [nodeId, depth]
+    $visited = [$startId => true];
+    $result  = [];
+    while (!empty($queue)) {
+        [$node, $depth] = array_shift($queue);
+        if ($depth > $maxHops) break;
+        $result[] = $node;
+        foreach ($graph[$node] ?? [] as $neighbor) {
+            if (!isset($visited[$neighbor])) {
+                $visited[$neighbor] = true;
+                $queue[] = [$neighbor, $depth + 1];
+            }
+        }
+    }
+    return $result;
+}
+Where Graphs Live in Your Work
+System	Nodes	Edges	Query
+Javadio producer network	Users/producers	Collaborations	"Who should I collab with next?"
+Music recommendation	Tracks	Shared genre/mood/BPM	"What sounds like this track?"
+Klutch Kantent CMS	Blog posts	Tags / related content	"What should I link to from here?"
+Pokemon badge system	Achievements	Prerequisites	"What badge unlocks next?"
+Dependency resolution	PHP classes/services	require/import edges	"What breaks if I remove this?"
+
+Exercises
+•	Build an adjacency list from a list of [producerA, producerB] collaboration pairs. Then BFS to find all producers within 2 hops of a given producer.
+•	Detect if two tracks share any genre/mood/BPM tags using DFS — useful for "sounds like" recommendations.
+•	YOUR PROJECT TASK — Javadio collab graph: design the database schema (users, collaborations table) and write a PHP function that returns "recommended producers" based on shared tags using BFS depth-2.
+ Pattern 5 — Sorting & Binary Search
+CORE IDEA: A sorted structure lets you find things in O(log n) instead of O(n). Every database index you create is this principle applied at scale.
+Binary Search Template
+// Works on ANY sorted array. O(log n) — 1M items = ~20 steps.
+function binarySearch(array $arr, $target): int {
+    $lo = 0; $hi = count($arr) - 1;
+    while ($lo <= $hi) {
+        $mid = intdiv($lo + $hi, 2);
+        if ($arr[$mid] === $target) return $mid;  // found
+        if ($arr[$mid] < $target)  $lo = $mid + 1; // search right
+        else                       $hi = $mid - 1; // search left
+    }
+    return -1; // not found
+}
+Sorting Algorithms — Know These Three
+Algorithm	Time	Space	When to use
+usort() / Quicksort	O(n log n) avg	O(log n)	General-purpose. PHP usort() uses this internally. Use for track/playlist ordering.
+Merge Sort	O(n log n) stable	O(n)	When you need STABLE sort (preserves tie order). Use for ranking where ties matter.
+Counting / Bucket Sort	O(n + k)	O(k)	When values are bounded integers — e.g., sorting tracks by BPM (40–200 range).
+Why Your Database Indexes = Binary Search
+Every CREATE INDEX in your migrations is the database building a sorted B-tree so it can binary-search instead of full-table scan. This is exactly why you added:
+-- From 004_file_metadata.sql — each index enables O(log n) lookup
+CREATE INDEX idx_file_metadata_hash_sha256  ON file_metadata(hash_sha256);
+CREATE INDEX idx_file_metadata_scan_status  ON file_metadata(scan_status);
+CREATE INDEX idx_file_metadata_owner        ON file_metadata(owner_type, owner_id);
+-- Without these: O(n) full scan on every findByHash() call
+-- With these:    O(log n) B-tree lookup — fast even at 10M rows
+
+Exercises
+•	Implement binary search to find a track by BPM in a sorted array. Then extend it to find all tracks within a BPM range [low, high].
+•	Sort a playlist of tracks by: (1) BPM ascending, (2) title alphabetically as a tiebreaker. Use usort() with a custom comparator.
+•	Counting sort: sort 10,000 tracks by BPM (range 60-200) in O(n). Compare runtime to usort() on the same data.
+•	YOUR PROJECT TASK — leaderboard: design the Javadio badge/points leaderboard. Write the SQL (with proper indexes) and PHP to efficiently fetch the top 100 producers and any given producer's rank.
+ 6-Week Study Schedule
+30–45 minutes per session, 3–4 sessions per week. Each week has a concept focus + a project task that applies it directly to your codebase.
+Week	Focus	Theory (2 sessions)	Project Task (1–2 sessions)
+1	Hash Maps	Two Sum, frequency count, anagram grouping	ETL dedup function — hash map vs. nested loop benchmark
+2	Sliding Window	Longest unique substring, max window average	Chunked CSV reader generator for TFN XML import
+3	Recursion + Trees	Directory size sum, flatten taxonomy, XML parser	JAOS folder scanner — JSON manifest with hash + type
+4	Graphs	BFS/DFS on producer adjacency list, cycle detection	Javadio collab graph schema + BFS recommendation query
+5	Sorting + Search	BPM binary search, usort comparators, counting sort benchmark	Badge leaderboard — SQL schema, indexes, rank query
+6	Synthesis	Mix patterns: ETL pipeline end-to-end with all 5 patterns applied	Full ETL run: Extract XML → Transform → Load → deduplicate → index
+
+
+Rules for the Sessions
+•	No copy-paste. Type every solution from scratch. The muscle memory matters.
+•	After solving, ask: "What is the Big O?" and "Where does this pattern already exist in my codebase?"
+•	For every project task, write it in PHP first (your home language), then try it in Python (Money Mike's language) so you can collaborate more fluidly.
+•	Use var_dump() and dd() liberally — understanding what's in memory at each step IS the skill.
+•	When you get stuck, draw the data structure on paper first. Algorithm problems are visual before they are code.
+ Quick Reference — Patterns at a Glance
+Pattern	Key data structure	Time complexity	Reach for it when...
+Hash Map	Array / Dictionary	O(1) read/write	Deduplication, counting, fast lookup by key
+Sliding Window	Two pointers + array	O(n)	Processing contiguous sequences, streams, chunked data
+Recursion/Tree	Stack (call stack)	O(n) or O(n log n)	Nested structures: folders, XML, taxonomies, version chains
+BFS	Queue	O(V + E)	Shortest path, "within N hops", level-by-level traversal
+DFS	Stack / recursion	O(V + E)	All paths, deep exploration, cycle detection
+Binary Search	Sorted array	O(log n)	Searching sorted data, range queries, index-backed DB lookups
+Merge/Quicksort	Array	O(n log n)	Ordering tracks, playlists, leaderboards, ranked results
+
+Decision Tree — Which Pattern?
+Need fast lookup?  →  Hash Map
+Processing a sequence/stream with fixed window?  →  Sliding Window
+Data is nested / hierarchical?  →  Recursion + Tree Traversal
+Finding connections / shortest path between things?  →  BFS / DFS
+Data is sorted, or you need it sorted?  →  Binary Search / Merge Sort
+Need to rank / order a collection?  →  Sorting + custom comparator
+
+The algorithm is the thinking. The code is just the record of it.
+AJ · Javadio × Klutch Kantent · 2026
