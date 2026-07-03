@@ -1,34 +1,43 @@
 # PHP / LAMP STACK
 
-
 .idea/
-
-
-# I'll fill this out later
-
-
-!/zzWIP/
-
+.cursor/
 /zzAJ/
 
+# Secrets & local config
 .env
+.env.*
+!.env.example
+.env.backup
+.env.production
+.env.local
+.env.*.local
+config.local.php
+notes.txt
+kanjav_music
+kanjav_music.pub
+*.pem
+*.key
+id_rsa*
+id_ed25519*
+
+# WIP email / credential dumps (do not force-track zzWIP)
+zzWIP/email_settings
+
+# Logs
+logs/
+*.log
 
 # Composer dependencies
 /vendor/
-
-# Composer PHAR
 /composer.phar
 
-# Environment files
-.env
-.env.local
-.env.*.local
-
-# Logs and cache
+# Logs and cache (Laravel-style paths if used later)
 /storage/logs/
 /storage/framework/cache/
 /storage/framework/sessions/
-storage/debugbar/   # if using Laravel Debugbar
+storage/debugbar/
+storage/framework/views/
 
 # PHPUnit
 /phpunit.xml
@@ -43,6 +52,8 @@ Thumbs.db
 .vscode/
 *.sublime-workspace
 *.sublime-project
+*.iml
+*.swp
 
 # Node modules (if using npm/yarn for frontend assets)
 node_modules/
@@ -54,26 +65,11 @@ public/hot
 # Laravel specific
 /bootstrap/cache/*.php
 
-# Ignore compiled templates (Twig, Plates, Blade caches if applicable)
-storage/framework/views/
-
-# Ignore coverage reports
+# Coverage reports
 coverage/
 coverage.xml
 
-# Ignore system files
-*.log
-
-# Ignore deployment files
-.env.backup
-.env.production
-
-# Ignore other common files
+# Other common files
 *.cache
 *.bak
 *.tmp
-
-# Ignore generated files by IDEs or tools
-*.iml
-*.swp
-
