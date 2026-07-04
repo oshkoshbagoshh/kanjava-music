@@ -20,6 +20,19 @@ cp .env.example .env
 
 ## Production (Hostinger)
 
+### Deploy from GitHub
+
+1. **hPanel → Websites → kanjavamusic.com → Deploy from GitHub** — connect the repo and select branch `main`.
+2. **Deployment directory** — leave the subfolder **blank** so the full repo lands in `public_html/` (do not enter `public`; that nests paths incorrectly).
+3. **Document root** — in domain/website settings, set document root to `public_html/public` so `config.php` stays above the web tree.
+4. **Environment variables** — add DB and app settings in **hPanel → Environment variables** (see table below) before the first deploy.
+5. **Deploy** — push to `main` or trigger deploy in hPanel; confirm `https://kanjavamusic.com` loads the homepage.
+6. **Verify** — `config.php`, `.env`, `exercises/`, and `notes/` must not be reachable in a browser (only files under `public/` should be).
+
+Deploy from `main` only after secrets live in Hostinger’s panel, not in the repository.
+
+### Environment variables
+
 Set the same variables in **hPanel → Environment variables** (or a server-only `.env` that is never committed):
 
 | Variable     | Purpose              |
@@ -30,8 +43,6 @@ Set the same variables in **hPanel → Environment variables** (or a server-only
 | `DB_NAME`    | MySQL database name  |
 | `DB_CHARSET` | Usually `utf8mb4`    |
 | `APP_ENV`    | `production`         |
-
-Deploy from `main` only after secrets live in Hostinger’s panel, not in the repository.
 
 ## Secrets policy
 

@@ -1,4 +1,9 @@
-RewriteEngine On
-RewriteCond %{REQUEST_URI} !^/zzpublic/
-RewriteRule ^(.*)$ /zzpublic/$1 [L]
+# Kanjava Music — document root (public/)
+Options -Indexes
 
+DirectoryIndex index.php index.html
+
+# Block hidden files if any are ever uploaded here by mistake
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
