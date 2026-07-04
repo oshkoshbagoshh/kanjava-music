@@ -1,75 +1,100 @@
-# kanjava-music
+# Kanjava Music
 
-Kanjava Music — LAMP showcase site (Apache, PHP, MySQL).
+Royalty-free sample / MIDI marketplace for ghost producers.
 
-Document root is `public/` so application config (`config.php`) stays above the web tree.
+Producers retain copyright; buyers get a usage license with no ongoing royalty obligation.
+
+## Stack
+
+| Layer | Choice |
+|-------|--------|
+| API | Node.js 20 + Express + TypeScript |
+| DB / ORM | PostgreSQL 16 + Drizzle |
+| Search | `pg_trgm` + `tsvector` / `tsquery` |
+| Jobs | BullMQ + Redis |
+| Storage | Local filesystem (dev) or S3-compatible (prod) |
+| Player | Vanilla TS + Web Audio API |
 
 ## Local development (Docker)
 
 **Requirements:** [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 
-1. Copy the environment template (if you don't already have `.env`):
+1. Copy the environment template:
 
 ```bash
 cp .env.example .env
 ```
 
-2. Start the stack:
+2. Start the stack (API, worker, Postgres, Redis):
 
 ```bash
 docker compose up --build
 ```
 
-3. Open the site:
+3. Open the marketplace:
 
-| Service     | URL                    |
-|-------------|------------------------|
-| Website     | http://localhost:8080  |
-| phpMyAdmin  | http://localhost:8082  |
+| Service | URL |
+|---------|-----|
+| App | http://localhost:3000 |
+| Health | http://localhost:3000/api/health |
 
-**Database (inside Docker):**
+Source is bind-mounted. The app container runs migrations, builds the client bundle, and starts the API. The worker processes preview encodes and waveform peaks.
 
-| Setting  | Value     |
-|----------|-----------|
-| Host     | `db` (from web container) or `localhost:3306` (from your machine) |
-| Database | `kanjava` |
-| User     | `kanjava` |
-| Password | `kanjava` |
-| Root     | `root` / `root` |
-
-Source is bind-mounted, so edits to PHP/CSS/JS show up on refresh — no rebuild needed for code changes.
-
-Stop the stack:
+Stop:
 
 ```bash
 docker compose down
 ```
 
-Remove the database volume (fresh MySQL):
+Reset database volume:
 
 ```bash
 docker compose down -v
 ```
 
-## Local setup (without Docker)
+## Local development (without Docker)
 
-1. Copy `.env.example` to `.env` and set `DB_HOST=localhost` with your MySQL credentials.
-2. Point your web server document root at `public/`.
+Requirements: Node 20+, PostgreSQL 16 (with `pg_trgm`), Redis, ffmpeg.
 
-`config.php` loads `.env` when present. Never commit `.env` or other secret files.
+```bash
+cp .env.example .env
+# Set DATABASE_URL and REDIS_URL for your local services
 
-## Deployment (later)
+npm install
+npm run db:migrate
+npm run build:client
+npm run dev          # API on :3000
+npm run dev:worker   # waveform / preview worker (separate terminal)
+```
 
-Hostinger and other hosts are deferred for now. When you're ready:
+## Scripts
 
-- Deploy the repo with document root at `public/`
-- Keep secrets in a server-only `.env` (not in Git)
-- See git history / prior docs for Hostinger GitHub deploy notes
+| Script | Purpose |
+|--------|---------|
+| `npm run dev` | API with hot reload |
+| `npm run dev:worker` | BullMQ waveform worker |
+| `npm run build:client` | Bundle browser player/browse UI |
+| `npm run db:migrate` | Apply SQL migrations |
+| `npm test` | Unit tests (Vitest) |
+
+## Phase 1 scope
+
+- Upload / browse / preview (Web Audio player)
+- Fuzzy + faceted search (`pg_trgm` + FTS)
+- Producer auth (JWT cookie)
+- Free royalty-free downloads with `license_snapshot_json`
+- Upload agreement acceptance (`docs/producer-agreement-v1.md`)
+
+**Not in Phase 1:** badges, paid tiers, fingerprinting, embeds, recommendations.
 
 ## Secrets policy
 
 Do not commit:
 
-- `.env` (use `.env.example` as the template)
-- SSH private keys (store under `~/.ssh/`)
-- Credential notes, passwords, or mailbox setup dumps
+- `.env` (use `.env.example`)
+- SSH private keys
+- Credential notes or passwords
+
+## License
+
+See [LICENSE](LICENSE) for the project license (GPLv2). Product listings use royalty-free licensing terms defined in the producer agreement — that is separate from this repository’s source license.

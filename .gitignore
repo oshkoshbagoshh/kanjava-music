@@ -1,5 +1,3 @@
-# PHP / LAMP STACK
-
 .idea/
 .cursor/
 /zzAJ/
@@ -12,7 +10,6 @@
 .env.production
 .env.local
 .env.*.local
-config.local.php
 notes.txt
 kanjav_music
 kanjav_music.pub
@@ -28,21 +25,14 @@ zzWIP/email_settings
 logs/
 *.log
 
-# Composer dependencies
-/vendor/
-/composer.phar
+# Local media storage
+/storage/
 
-# Logs and cache (Laravel-style paths if used later)
-/storage/logs/
-/storage/framework/cache/
-/storage/framework/sessions/
-storage/debugbar/
-storage/framework/views/
-
-# PHPUnit
-/phpunit.xml
-/phpunit.xml.dist
-/phpunit.result.cache
+# Node
+node_modules/
+dist/
+public/js/app.js
+public/js/app.js.map
 
 # OS generated files
 .DS_Store
@@ -54,16 +44,6 @@ Thumbs.db
 *.sublime-project
 *.iml
 *.swp
-
-# Node modules (if using npm/yarn for frontend assets)
-node_modules/
-
-# Build directories (if any)
-public/build/
-public/hot
-
-# Laravel specific
-/bootstrap/cache/*.php
 
 # Coverage reports
 coverage/

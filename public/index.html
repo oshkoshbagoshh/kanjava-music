@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kanjava Music — Royalty-Free Samples & MIDI</title>
+  <meta
+    name="description"
+    content="Royalty-free sample, loop, MIDI, and preset marketplace for ghost producers. Producer retains copyright; you get a usage license with no ongoing royalties."
+  />
+  <link rel="stylesheet" href="/css/marketplace.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="site-header__inner">
+      <a class="logo" href="/">Kanjava Music</a>
+      <p class="tagline">Royalty-free samples, loops &amp; MIDI for ghost producers</p>
+      <div class="auth-bar">
+        <span id="auth-status">Not signed in</span>
+        <button type="button" id="logout-btn" class="btn btn--ghost">Sign out</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="layout">
+    <aside class="sidebar">
+      <section class="panel" id="auth-forms">
+        <h2>Producer account</h2>
+        <p id="auth-message" class="message" role="status"></p>
+
+        <form id="login-form" class="stack">
+          <h3>Sign in</h3>
+          <label>Email <input name="email" type="email" required /></label>
+          <label>Password <input name="password" type="password" required minlength="8" /></label>
+          <button type="submit" class="btn">Sign in</button>
+        </form>
+
+        <form id="register-form" class="stack">
+          <h3>Register</h3>
+          <label>Username <input name="username" required pattern="[a-z0-9_]{3,32}" /></label>
+          <label>Display name <input name="displayName" required /></label>
+          <label>Email <input name="email" type="email" required /></label>
+          <label>Password <input name="password" type="password" required minlength="8" /></label>
+          <button type="submit" class="btn">Create account</button>
+        </form>
+      </section>
+
+      <section class="panel" id="upload-section" hidden>
+        <h2>Upload</h2>
+        <p class="hint">
+          By uploading you grant a royalty-free license under the terms you select.
+          You retain copyright. See
+          <a href="/docs/producer-agreement-v1.md" target="_blank" rel="noopener">Producer Agreement v1</a>.
+        </p>
+        <p id="upload-message" class="message" role="status"></p>
+        <form id="upload-form" class="stack" enctype="multipart/form-data">
+          <label>Title <input name="title" required maxlength="255" /></label>
+          <label>Description <textarea name="description" rows="3"></textarea></label>
+          <label>
+            Type
+            <select name="type" required>
+              <option value="sample">Sample</option>
+              <option value="loop">Loop</option>
+              <option value="midi">MIDI</option>
+              <option value="preset">Preset</option>
+              <option value="one_shot">One-shot</option>
+            </select>
+          </label>
+          <label>
+            License
+            <select name="licenseType">
+              <option value="royalty_free_standard">Royalty-free standard</option>
+              <option value="royalty_free_exclusive">Royalty-free exclusive</option>
+              <option value="cc0">CC0</option>
+              <option value="cc_by">CC BY</option>
+            </select>
+          </label>
+          <label>BPM <input name="bpm" type="number" min="1" max="400" /></label>
+          <label>Camelot key <input name="musicalKey" placeholder="8A" maxlength="8" /></label>
+          <label>Tags <input name="tags" placeholder="techno, acid" /></label>
+          <label>File <input name="file" type="file" required accept="audio/*,.mid,.midi,.wav,.mp3,.aiff,.flac" /></label>
+          <label class="checkbox">
+            <input name="agreementAccepted" type="checkbox" value="true" required />
+            I accept the Producer Agreement (v1) and warrant I hold rights to license this work.
+          </label>
+          <button type="submit" class="btn">Upload</button>
+        </form>
+      </section>
+
+      <section class="panel">
+        <h2>Filters</h2>
+        <form id="search-form" class="stack">
+          <label>Search <input id="q" name="q" placeholder="kick, acid, pad…" /></label>
+          <label>
+            Type
+            <select id="type" name="type">
+              <option value="">Any</option>
+              <option value="sample">Sample</option>
+              <option value="loop">Loop</option>
+              <option value="midi">MIDI</option>
+              <option value="preset">Preset</option>
+              <option value="one_shot">One-shot</option>
+            </select>
+          </label>
+          <div class="row">
+            <label>BPM min <input id="bpm_min" type="number" min="1" max="400" /></label>
+            <label>BPM max <input id="bpm_max" type="number" min="1" max="400" /></label>
+          </div>
+          <label>Key <input id="key" placeholder="8A" /></label>
+          <label>
+            License
+            <select id="license_type">
+              <option value="">Any</option>
+              <option value="royalty_free_standard">Royalty-free standard</option>
+              <option value="royalty_free_exclusive">Royalty-free exclusive</option>
+              <option value="cc0">CC0</option>
+              <option value="cc_by">CC BY</option>
+            </select>
+          </label>
+          <label>Tags <input id="tags" placeholder="techno, acid" /></label>
+          <div class="row">
+            <button type="submit" class="btn">Search</button>
+            <button type="button" id="clear-filters" class="btn btn--ghost">Clear</button>
+          </div>
+        </form>
+      </section>
+    </aside>
+
+    <section class="content">
+      <header class="content-header">
+        <h1 id="page-heading">Browse</h1>
+        <p id="search-status" class="message">Loading…</p>
+      </header>
+      <div id="resource-grid" class="resource-grid"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>
+      All listings are <strong>royalty-free</strong> — the producer retains copyright;
+      buyers receive a usage license with no ongoing royalty obligation.
+    </p>
+  </footer>
+
+  <script type="module" src="/js/app.js"></script>
+</body>
+</html>

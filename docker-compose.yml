@@ -1,51 +1,85 @@
 services:
-  web:
+  app:
     build: .
     ports:
-      - "8080:80"
+      - "3000:3000"
     volumes:
-      - .:/var/www/html
+      - .:/app
+      - app_node_modules:/app/node_modules
+      - storage_data:/app/storage
     env_file:
       - .env
     environment:
-      DB_HOST: db
-      DB_USER: kanjava
-      DB_PASS: kanjava
-      DB_NAME: kanjava
-      DB_CHARSET: utf8mb4
+      DATABASE_URL: postgresql://kanjava:kanjava@postgres:5432/kanjava
+      REDIS_URL: redis://redis:6379
+      STORAGE_DRIVER: local
+      STORAGE_LOCAL_PATH: /app/storage
+      APP_URL: http://localhost:3000
+      JWT_SECRET: dev-jwt-secret-change-in-production
       APP_ENV: development
+      PORT: 3000
     depends_on:
-      db:
+      postgres:
         condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: sh -c "npm install && npm run db:migrate && npm run build:client && npm run dev"
 
-  db:
-    image: mysql:8.0
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: kanjava
-      MYSQL_USER: kanjava
-      MYSQL_PASSWORD: kanjava
-    ports:
-      - "3306:3306"
+  worker:
+    build: .
     volumes:
-      - db_data:/var/lib/mysql
+      - .:/app
+      - app_node_modules:/app/node_modules
+      - storage_data:/app/storage
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql://kanjava:kanjava@postgres:5432/kanjava
+      REDIS_URL: redis://redis:6379
+      STORAGE_DRIVER: local
+      STORAGE_LOCAL_PATH: /app/storage
+      APP_ENV: development
+      JWT_SECRET: dev-jwt-secret-change-in-production
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      app:
+        condition: service_started
+    command: sh -c "npm install && npm run dev:worker"
+
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: kanjava
+      POSTGRES_PASSWORD: kanjava
+      POSTGRES_DB: kanjava
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      test: ["CMD-SHELL", "pg_isready -U kanjava -d kanjava"]
       interval: 5s
       timeout: 5s
       retries: 10
 
-  phpmyadmin:
-    image: phpmyadmin:latest
+  redis:
+    image: redis:7-alpine
     ports:
-      - "8082:80"
-    environment:
-      PMA_HOST: db
-      PMA_USER: kanjava
-      PMA_PASSWORD: kanjava
-    depends_on:
-      db:
-        condition: service_healthy
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
 volumes:
-  db_data:
+  postgres_data:
+  redis_data:
+  app_node_modules:
+  storage_data:

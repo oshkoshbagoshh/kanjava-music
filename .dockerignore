@@ -3,7 +3,11 @@
 .idea
 .cursor
 node_modules
-vendor
+dist
+storage
 *.log
 .env.backup
 .DS_Store
+exercises
+notes
+zzWIP
