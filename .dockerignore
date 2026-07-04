@@ -1,0 +1,9 @@
+.git
+.gitignore
+.idea
+.cursor
+node_modules
+vendor
+*.log
+.env.backup
+.DS_Store

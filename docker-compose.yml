@@ -1,0 +1,51 @@
+services:
+  web:
+    build: .
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/var/www/html
+    env_file:
+      - .env
+    environment:
+      DB_HOST: db
+      DB_USER: kanjava
+      DB_PASS: kanjava
+      DB_NAME: kanjava
+      DB_CHARSET: utf8mb4
+      APP_ENV: development
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: kanjava
+      MYSQL_USER: kanjava
+      MYSQL_PASSWORD: kanjava
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    ports:
+      - "8082:80"
+    environment:
+      PMA_HOST: db
+      PMA_USER: kanjava
+      PMA_PASSWORD: kanjava
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  db_data:
