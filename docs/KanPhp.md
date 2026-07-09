@@ -31,8 +31,8 @@
    ------------------------------ */
 define('HOST', 'localhost');
 define('USER', 'root');
-define('PASSWORD', '');
-define('DATABASE', 'april_fool_db');
+define('PASSWORD', 'rootroot'); 
+define('DATABASE', 'dev_db');
 define('APP_MODE', 'development'); // switch to 'production' wisely
 
 // Enable error reporting in development
@@ -61,7 +61,7 @@ if (!isset($_SESSION['start_time'])) {
 // Set some demo user data
 $_SESSION['user_name'] = 'stew';
 $_SESSION['logged_in'] = 1;
-$_SESSION['Red_barrel'] = str_rot13($_SESSION['user_name']);
+$_SESSION['fashionize'] = str_rot13($_SESSION['user_name']);
 
 /* ------------------------------
    3. Lottery / Golden Ticket System Setup
