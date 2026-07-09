@@ -6,6 +6,7 @@ import { Worker } from 'bullmq';
 import { eq } from 'drizzle-orm';
 import { spawn } from 'node:child_process';
 import { mkdirSync, unlinkSync, writeFileSync, readFileSync, existsSync } from 'node:fs';
+import { extname } from 'node:path';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import ffmpegPath from 'ffmpeg-static';
@@ -85,11 +86,77 @@ async function extractPeaks(inputPath: string): Promise<{ peaks: number[]; durat
   return { peaks, durationMs };
 }
 
+async function encodePreviewFromInput(
+  inputPath: string,
+  resourceId: string,
+  workDir: string,
+): Promise<{
+  previewKey: string;
+  waveformKey: string;
+  durationMs: number;
+}> {
+  const previewPath = join(workDir, 'preview.mp3');
+
+  await runFfmpeg([
+    '-y',
+    '-i',
+    inputPath,
+    '-codec:a',
+    'libmp3lame',
+    '-b:a',
+    '128k',
+    '-ar',
+    '44100',
+    '-ac',
+    '2',
+    previewPath,
+  ]);
+
+  const previewBuf = readFileSync(previewPath);
+  const previewKey = `previews/${resourceId}.mp3`;
+  await storage.put(previewKey, previewBuf, 'audio/mpeg');
+
+  const { peaks, durationMs } = await extractPeaks(previewPath);
+  const waveformJson = JSON.stringify({ peaks, duration_ms: durationMs });
+  const waveformKey = `waveforms/${resourceId}.json`;
+  await storage.put(waveformKey, Buffer.from(waveformJson, 'utf8'), 'application/json');
+
+  return { previewKey, waveformKey, durationMs };
+}
+
+async function processCompanionPreview(
+  companionPreviewKey: string,
+  resourceId: string,
+  workDir: string,
+): Promise<{
+  previewKey: string;
+  waveformKey: string;
+  durationMs: number;
+}> {
+  const companion = await storage.get(companionPreviewKey);
+  const ext = extname(companionPreviewKey).toLowerCase() || '.mp3';
+  const inputPath = join(workDir, `companion${ext}`);
+  writeFileSync(inputPath, companion);
+
+  if (ext === '.mp3') {
+    const { peaks, durationMs } = await extractPeaks(inputPath);
+    const waveformKey = `waveforms/${resourceId}.json`;
+    const waveformJson = JSON.stringify({ peaks, duration_ms: durationMs });
+    await storage.put(waveformKey, Buffer.from(waveformJson, 'utf8'), 'application/json');
+    return {
+      previewKey: companionPreviewKey,
+      waveformKey,
+      durationMs,
+    };
+  }
+
+  return encodePreviewFromInput(inputPath, resourceId, workDir);
+}
+
 async function processResource(job: ProcessResourceJob): Promise<void> {
-  const { resourceId, originalKey } = job;
+  const { resourceId, originalKey, companionPreviewKey } = job;
   console.log(`[worker] processing ${resourceId}`);
 
-  const original = await storage.get(originalKey);
   const workDir = join(tmpdir(), `kanjava-${resourceId}`);
   mkdirSync(workDir, { recursive: true });
 
@@ -97,44 +164,29 @@ async function processResource(job: ProcessResourceJob): Promise<void> {
   const inputPath = join(workDir, `original${ext}`);
   const previewPath = join(workDir, 'preview.mp3');
 
-  writeFileSync(inputPath, original);
-
   const isMidi = ext === '.mid' || ext === '.midi';
+  const isZip = ext === '.zip';
 
   let previewKey: string | null = null;
   let waveformKey: string | null = null;
   let durationMs: number | null = null;
 
-  if (!isMidi) {
-    try {
-      await runFfmpeg([
-        '-y',
-        '-i',
-        inputPath,
-        '-codec:a',
-        'libmp3lame',
-        '-b:a',
-        '128k',
-        '-ar',
-        '44100',
-        '-ac',
-        '2',
-        previewPath,
-      ]);
-
-      const previewBuf = readFileSync(previewPath);
-      previewKey = `previews/${resourceId}.mp3`;
-      await storage.put(previewKey, previewBuf, 'audio/mpeg');
-
-      const { peaks, durationMs: ms } = await extractPeaks(previewPath);
-      durationMs = ms;
-      const waveformJson = JSON.stringify({ peaks, duration_ms: durationMs });
-      waveformKey = `waveforms/${resourceId}.json`;
-      await storage.put(waveformKey, Buffer.from(waveformJson, 'utf8'), 'application/json');
-    } catch (err) {
-      console.error(`[worker] audio processing failed for ${resourceId}:`, err);
-      // MIDI and non-audio still get approved without preview.
+  try {
+    if (companionPreviewKey) {
+      const result = await processCompanionPreview(companionPreviewKey, resourceId, workDir);
+      previewKey = result.previewKey;
+      waveformKey = result.waveformKey;
+      durationMs = result.durationMs;
+    } else if (!isMidi && !isZip) {
+      const original = await storage.get(originalKey);
+      writeFileSync(inputPath, original);
+      const result = await encodePreviewFromInput(inputPath, resourceId, workDir);
+      previewKey = result.previewKey;
+      waveformKey = result.waveformKey;
+      durationMs = result.durationMs;
     }
+  } catch (err) {
+    console.error(`[worker] audio processing failed for ${resourceId}:`, err);
   }
 
   await db
@@ -148,7 +200,6 @@ async function processResource(job: ProcessResourceJob): Promise<void> {
     })
     .where(eq(resources.id, resourceId));
 
-  // Cleanup temp files
   for (const f of [inputPath, previewPath]) {
     if (existsSync(f)) unlinkSync(f);
   }

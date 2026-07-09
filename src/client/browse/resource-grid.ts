@@ -3,11 +3,15 @@ import { createResourceCard, type ResourceCardData } from './resource-card.js';
 export interface SearchParams {
   q?: string;
   type?: string;
+  format?: string;
   bpm_min?: string;
   bpm_max?: string;
   key?: string;
   license_type?: string;
   tags?: string;
+  genre?: string;
+  genres?: string;
+  daw?: string;
 }
 
 export async function fetchResources(

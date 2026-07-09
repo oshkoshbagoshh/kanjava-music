@@ -6,6 +6,8 @@ export const PROCESS_RESOURCE_QUEUE = 'process-resource';
 export interface ProcessResourceJob {
   resourceId: string;
   originalKey: string;
+  /** Pre-uploaded preview for zip/MIDI when producer supplies companion audio. */
+  companionPreviewKey?: string | null;
 }
 
 /** Shared BullMQ connection options (avoids ioredis version conflicts). */

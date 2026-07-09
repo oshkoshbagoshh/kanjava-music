@@ -75,6 +75,7 @@ npm run dev:worker   # waveform / preview worker (separate terminal)
 | `npm run dev:worker` | BullMQ waveform worker |
 | `npm run build:client` | Bundle browser player/browse UI |
 | `npm run db:migrate` | Apply SQL migrations |
+| `npm run db:seed` | Seed sample bundles (requires approved resources) |
 | `npm test` | Unit tests (Vitest) |
 
 ## Phase 1 scope
@@ -85,7 +86,19 @@ npm run dev:worker   # waveform / preview worker (separate terminal)
 - Free royalty-free downloads with `license_snapshot_json`
 - Upload agreement acceptance (`docs/producer-agreement-v1.md`)
 
-**Not in Phase 1:** badges, paid tiers, fingerprinting, embeds, recommendations.
+## Phase 2 scope (catalog expansion)
+
+- WMDM-style product types: DAW templates, stems, sample packs, vocal packs
+- Structured genre taxonomy + DAW metadata on resources
+- Dual pricing fields (regular + exclusive) on listings and cards
+- Homepage discovery: browse by genre, production asset categories, bundles
+- Zip uploads with companion preview audio for templates/packs
+- Unified account copy (browse, buy, and sell on one login)
+- APIs: `GET /api/genres`, `GET /api/catalog/formats`, `GET /api/bundles`
+
+**Not in Phase 2:** Stripe checkout, cart, play queue, admin moderation UI, producer earnings dashboard.
+
+**Deferred (Phase 3+):** badges, fingerprinting, embeds, recommendations, courses/ebooks/plugins.
 
 ## Secrets policy
 

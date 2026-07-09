@@ -1,11 +1,14 @@
-import { eq } from 'drizzle-orm';
+import { eq, inArray } from 'drizzle-orm';
 import { extname } from 'node:path';
 import { v4 as uuidv4 } from 'uuid';
 import { env } from '../config/env.js';
 import { db } from '../db/client.js';
 import {
+  type DawType,
   type LicenseType,
   type ResourceType,
+  genres,
+  resourceGenres,
   resourceTags,
   resources,
   uploadAgreements,
@@ -13,6 +16,9 @@ import {
 import { sha256 } from './hash.service.js';
 import { enqueueProcessResource } from './queue.js';
 import { storage } from './storage.service.js';
+import {
+  validateUploadMeta,
+} from './upload-validation.js';
 
 export interface UploadInput {
   producerId: string;
@@ -20,11 +26,20 @@ export interface UploadInput {
   description?: string;
   type: ResourceType;
   licenseType: LicenseType;
+  daw?: DawType;
   bpm?: number;
   musicalKey?: string;
   tags?: string[];
+  genres: string[];
+  regularPriceCents?: number;
+  exclusivePriceCents?: number;
   agreementAccepted: boolean;
   file: {
+    buffer: Buffer;
+    originalname: string;
+    mimetype: string;
+  };
+  previewFile?: {
     buffer: Buffer;
     originalname: string;
     mimetype: string;
@@ -54,6 +69,39 @@ export class UploadService {
       );
     }
 
+    if (input.genres.length === 0) {
+      throw new UploadError('At least one genre is required.', 400);
+    }
+
+    const uniqueGenres = [...new Set(input.genres.map((g) => g.trim().toLowerCase()))];
+    const knownGenres = await db.query.genres.findMany({
+      where: inArray(genres.slug, uniqueGenres),
+    });
+
+    if (knownGenres.length !== uniqueGenres.length) {
+      const known = new Set(knownGenres.map((g) => g.slug));
+      const unknown = uniqueGenres.filter((g) => !known.has(g));
+      throw new UploadError(`Unknown genre(s): ${unknown.join(', ')}`, 400);
+    }
+
+    const metaError = validateUploadMeta({
+      type: input.type,
+      daw: input.daw,
+      genres: uniqueGenres,
+      fileOriginalname: input.file.originalname,
+      hasPreviewFile: Boolean(input.previewFile),
+      previewOriginalname: input.previewFile?.originalname,
+      previewMimetype: input.previewFile?.mimetype,
+    });
+    if (metaError) {
+      throw new UploadError(metaError, 400);
+    }
+
+    const daw: DawType =
+      input.type === 'daw_template'
+        ? (input.daw ?? 'not_applicable')
+        : (input.daw ?? 'not_applicable');
+
     const fileHash = sha256(input.file.buffer);
 
     const existing = await db.query.resources.findFirst({
@@ -70,8 +118,19 @@ export class UploadService {
     const ext = extname(input.file.originalname).toLowerCase() || '.bin';
     const resourceId = uuidv4();
     const originalKey = `originals/${resourceId}${ext}`;
+    let companionPreviewKey: string | null = null;
 
     await storage.put(originalKey, input.file.buffer, input.file.mimetype);
+
+    if (input.previewFile) {
+      const previewExt = extname(input.previewFile.originalname).toLowerCase() || '.mp3';
+      companionPreviewKey = `previews/${resourceId}${previewExt}`;
+      await storage.put(
+        companionPreviewKey,
+        input.previewFile.buffer,
+        input.previewFile.mimetype || 'audio/mpeg',
+      );
+    }
 
     const [resource] = await db
       .insert(resources)
@@ -84,9 +143,12 @@ export class UploadService {
         fileUrl: originalKey,
         fileHash,
         licenseType: input.licenseType,
+        daw,
         bpm: input.bpm ?? null,
         musicalKey: input.musicalKey ?? null,
-        priceCents: null,
+        regularPriceCents: input.regularPriceCents ?? null,
+        exclusivePriceCents: input.exclusivePriceCents ?? null,
+        priceCents: input.regularPriceCents ?? null,
         status: 'pending',
       })
       .returning();
@@ -94,6 +156,13 @@ export class UploadService {
     if (!resource) {
       throw new UploadError('Failed to create resource', 500);
     }
+
+    await db.insert(resourceGenres).values(
+      uniqueGenres.map((genreSlug) => ({
+        resourceId: resource.id,
+        genreSlug,
+      })),
+    );
 
     await db.insert(uploadAgreements).values({
       producerId: input.producerId,
@@ -118,6 +187,7 @@ export class UploadService {
     await enqueueProcessResource({
       resourceId: resource.id,
       originalKey,
+      companionPreviewKey,
     });
 
     return {
@@ -125,7 +195,9 @@ export class UploadService {
       status: resource.status,
       title: resource.title,
       type: resource.type,
+      daw: resource.daw,
       licenseType: resource.licenseType,
+      genres: uniqueGenres,
     };
   }
 }
