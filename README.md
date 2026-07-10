@@ -78,6 +78,16 @@ npm run dev:worker   # waveform / preview worker (separate terminal)
 | `npm run db:seed` | Seed sample bundles (requires approved resources) |
 | `npm test` | Unit tests (Vitest) |
 
+## Documentation
+
+| Doc | Description |
+|-----|-------------|
+| [docs/README.md](docs/README.md) | Documentation index |
+| [docs/api.md](docs/api.md) | REST API reference |
+| [docs/developer-guide.md](docs/developer-guide.md) | Architecture and local development |
+| [docs/producer-upload-guide.md](docs/producer-upload-guide.md) | Uploading resources |
+| [docs/phase2-catalog.md](docs/phase2-catalog.md) | Phase 2 catalog expansion |
+
 ## Phase 1 scope
 
 - Upload / browse / preview (Web Audio player)
