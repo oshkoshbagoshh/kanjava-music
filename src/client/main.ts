@@ -7,6 +7,7 @@ import {
   renderGenreCheckboxes,
   renderGenreChips,
 } from './browse/discovery.js';
+import type { ResourceCardData } from './browse/resource-card.js';
 import {
   fetchResources,
   renderResourceGrid,
@@ -183,6 +184,7 @@ function bindAuth(): void {
 function updateUploadConditionalFields(): void {
   const typeSelect = document.getElementById('upload-type') as HTMLSelectElement | null;
   const dawField = document.getElementById('daw-field');
+  const dawSelect = document.getElementById('upload-daw') as HTMLSelectElement | null;
   const previewField = document.getElementById('preview-file-field');
   const previewInput = document.getElementById('upload-preview') as HTMLInputElement | null;
   const fileInput = document.getElementById('upload-file') as HTMLInputElement | null;
@@ -190,9 +192,14 @@ function updateUploadConditionalFields(): void {
   const type = typeSelect?.value ?? '';
   const fileName = fileInput?.files?.[0]?.name?.toLowerCase() ?? '';
   const isZip = fileName.endsWith('.zip');
+  const showDaw = type === 'daw_template';
 
   if (dawField) {
-    dawField.hidden = type !== 'daw_template';
+    dawField.hidden = !showDaw;
+  }
+  if (dawSelect) {
+    dawSelect.disabled = !showDaw;
+    if (!showDaw) dawSelect.value = '';
   }
 
   const needsPreview =
@@ -223,6 +230,13 @@ function bindUpload(): void {
     const fd = new FormData(form);
     if (!fd.get('agreementAccepted')) {
       if (msg) msg.textContent = 'You must accept the producer agreement.';
+      return;
+    }
+
+    if (fd.get('type') !== 'daw_template') {
+      fd.delete('daw');
+    } else if (!fd.get('daw')) {
+      if (msg) msg.textContent = 'Select a DAW for template uploads.';
       return;
     }
 
@@ -321,7 +335,7 @@ function bindArtistRoute(): void {
     }
     const data = (await res.json()) as {
       producer: Producer & { bio: string | null };
-      resources: import('./browse/resource-card.js').ResourceCardData[];
+      resources: ResourceCardData[];
     };
     if (heading) {
       heading.textContent = data.producer.displayName;
@@ -330,8 +344,7 @@ function bindArtistRoute(): void {
       status.textContent = data.producer.bio ?? `Royalty-free catalog · @${username}`;
     }
     if (grid) {
-      const { renderResourceGrid: render } = await import('./browse/resource-grid.js');
-      render(grid, data.resources);
+      renderResourceGrid(grid, data.resources);
     }
   })();
 }
