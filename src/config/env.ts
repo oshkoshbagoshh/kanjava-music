@@ -20,6 +20,7 @@ const envSchema = z.object({
   S3_SECRET_KEY: z.string().optional(),
   S3_PUBLIC_URL: z.string().optional(),
   AGREEMENT_VERSION: z.string().default('v1'),
+  MAX_UPLOAD_BYTES: z.coerce.number().int().positive().default(500 * 1024 * 1024),
 });
 
 const parsed = envSchema.safeParse(process.env);

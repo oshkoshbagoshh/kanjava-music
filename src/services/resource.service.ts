@@ -34,6 +34,7 @@ export class ResourceService {
       with: {
         producer: true,
         tags: true,
+        genres: true,
       },
     });
 
@@ -47,7 +48,7 @@ export class ResourceService {
   async getByIdInternal(id: string) {
     return db.query.resources.findFirst({
       where: eq(resources.id, id),
-      with: { producer: true, tags: true },
+      with: { producer: true, tags: true, genres: true },
     });
   }
 
@@ -91,8 +92,11 @@ export class ResourceService {
       throw new ResourceError('Resource not found.', 404);
     }
 
-    if (resource.priceCents !== null && resource.priceCents > 0) {
-      throw new ResourceError('Paid downloads are not available in Phase 1.', 402);
+    const effectivePrice =
+      resource.regularPriceCents ?? resource.priceCents ?? null;
+
+    if (effectivePrice !== null && effectivePrice > 0) {
+      throw new ResourceError('Paid downloads are not available yet.', 402);
     }
 
     const snapshot: LicenseSnapshot = {
@@ -101,7 +105,7 @@ export class ResourceService {
       licenseType: resource.licenseType,
       producerId: resource.producerId,
       producerUsername: resource.producer.username,
-      priceCents: resource.priceCents,
+      priceCents: effectivePrice,
       agreementVersion: env.AGREEMENT_VERSION,
       termsSummary:
         LICENSE_SUMMARIES[resource.licenseType] ??
@@ -140,6 +144,7 @@ export class ResourceService {
     title: string;
     description: string | null;
     type: string;
+    daw: string;
     previewUrl: string | null;
     waveformJsonUrl: string | null;
     durationMs: number | null;
@@ -147,18 +152,23 @@ export class ResourceService {
     musicalKey: string | null;
     licenseType: string;
     priceCents: number | null;
+    regularPriceCents: number | null;
+    exclusivePriceCents: number | null;
     downloadCount: number;
     playCount: number;
     status: string;
     createdAt: Date;
     producer: { username: string; displayName: string };
     tags: { tag: string }[];
+    genres: { genreSlug: string }[];
   }) {
+    const regularPrice = resource.regularPriceCents ?? resource.priceCents;
     return {
       id: resource.id,
       title: resource.title,
       description: resource.description,
       type: resource.type,
+      daw: resource.daw,
       previewUrl: resource.previewUrl
         ? storage.publicUrl(resource.previewUrl)
         : null,
@@ -169,7 +179,9 @@ export class ResourceService {
       bpm: resource.bpm,
       musicalKey: resource.musicalKey,
       licenseType: resource.licenseType,
-      priceCents: resource.priceCents,
+      priceCents: regularPrice,
+      regularPriceCents: regularPrice,
+      exclusivePriceCents: resource.exclusivePriceCents,
       downloadCount: resource.downloadCount,
       playCount: resource.playCount,
       createdAt: resource.createdAt,
@@ -179,6 +191,7 @@ export class ResourceService {
         displayName: resource.producer.displayName,
       },
       tags: resource.tags.map((t) => t.tag),
+      genres: resource.genres.map((g) => g.genreSlug),
     };
   }
 }

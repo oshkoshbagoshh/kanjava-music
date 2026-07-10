@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { authService } from '../services/auth.service.js';
+import { mapSearchRowToApi } from '../services/resource-mapper.js';
 import { searchService } from '../services/search.service.js';
-import { storage } from '../services/storage.service.js';
 
 export const producersRouter = Router();
 
@@ -22,23 +22,29 @@ producersRouter.get('/:username', async (req, res) => {
       limit: 50,
     });
 
-    const resources = rows.map((row) => ({
-      id: row.id,
-      title: row.title,
-      description: row.description,
-      type: row.type,
-      previewUrl: row.preview_url ? storage.publicUrl(row.preview_url) : null,
-      waveformJsonUrl: row.waveform_json_url
-        ? storage.publicUrl(row.waveform_json_url)
-        : null,
-      durationMs: row.duration_ms,
-      bpm: row.bpm,
-      musicalKey: row.musical_key,
-      licenseType: row.license_type,
-      downloadCount: row.download_count,
-      playCount: row.play_count,
-      tags: row.tags ?? [],
-    }));
+    const resources = rows.map((row) => {
+      const mapped = mapSearchRowToApi(row);
+      return {
+        id: mapped.id,
+        title: mapped.title,
+        description: mapped.description,
+        type: mapped.type,
+        daw: mapped.daw,
+        previewUrl: mapped.previewUrl,
+        waveformJsonUrl: mapped.waveformJsonUrl,
+        durationMs: mapped.durationMs,
+        bpm: mapped.bpm,
+        musicalKey: mapped.musicalKey,
+        licenseType: mapped.licenseType,
+        regularPriceCents: mapped.regularPriceCents,
+        exclusivePriceCents: mapped.exclusivePriceCents,
+        downloadCount: mapped.downloadCount,
+        playCount: mapped.playCount,
+        tags: mapped.tags,
+        genres: mapped.genres,
+        producer: mapped.producer,
+      };
+    });
 
     res.json({ producer, resources });
   } catch (err) {

@@ -1,4 +1,14 @@
 import {
+  loadBundles,
+  loadFormats,
+  loadGenres,
+  renderBundleStrip,
+  renderFormatCards,
+  renderGenreCheckboxes,
+  renderGenreChips,
+} from './browse/discovery.js';
+import type { ResourceCardData } from './browse/resource-card.js';
+import {
   fetchResources,
   renderResourceGrid,
   type SearchParams,
@@ -49,6 +59,7 @@ function readSearchParams(): SearchParams {
   return {
     q: (document.getElementById('q') as HTMLInputElement)?.value || undefined,
     type: (document.getElementById('type') as HTMLSelectElement)?.value || undefined,
+    format: (document.getElementById('format') as HTMLInputElement)?.value || undefined,
     bpm_min:
       (document.getElementById('bpm_min') as HTMLInputElement)?.value || undefined,
     bpm_max:
@@ -58,7 +69,27 @@ function readSearchParams(): SearchParams {
       (document.getElementById('license_type') as HTMLSelectElement)?.value ||
       undefined,
     tags: (document.getElementById('tags') as HTMLInputElement)?.value || undefined,
+    genre: (document.getElementById('genre') as HTMLSelectElement)?.value || undefined,
+    daw: (document.getElementById('daw') as HTMLSelectElement)?.value || undefined,
   };
+}
+
+function applyGenreFilter(slug: string): void {
+  const genreSelect = document.getElementById('genre') as HTMLSelectElement | null;
+  const formatInput = document.getElementById('format') as HTMLInputElement | null;
+  if (genreSelect) genreSelect.value = slug;
+  if (formatInput) formatInput.value = '';
+  document.getElementById('resource-grid')?.scrollIntoView({ behavior: 'smooth' });
+  void runSearch();
+}
+
+function applyFormatFilter(formatId: string): void {
+  const formatInput = document.getElementById('format') as HTMLInputElement | null;
+  const typeSelect = document.getElementById('type') as HTMLSelectElement | null;
+  if (formatInput) formatInput.value = formatId;
+  if (typeSelect) typeSelect.value = '';
+  document.getElementById('resource-grid')?.scrollIntoView({ behavior: 'smooth' });
+  void runSearch();
 }
 
 async function runSearch(): Promise<void> {
@@ -87,6 +118,8 @@ function bindSearch(): void {
 
   document.getElementById('clear-filters')?.addEventListener('click', () => {
     form?.reset();
+    const formatInput = document.getElementById('format') as HTMLInputElement | null;
+    if (formatInput) formatInput.value = '';
     void runSearch();
   });
 }
@@ -148,7 +181,43 @@ function bindAuth(): void {
   });
 }
 
+function updateUploadConditionalFields(): void {
+  const typeSelect = document.getElementById('upload-type') as HTMLSelectElement | null;
+  const dawField = document.getElementById('daw-field');
+  const dawSelect = document.getElementById('upload-daw') as HTMLSelectElement | null;
+  const previewField = document.getElementById('preview-file-field');
+  const previewInput = document.getElementById('upload-preview') as HTMLInputElement | null;
+  const fileInput = document.getElementById('upload-file') as HTMLInputElement | null;
+
+  const type = typeSelect?.value ?? '';
+  const fileName = fileInput?.files?.[0]?.name?.toLowerCase() ?? '';
+  const isZip = fileName.endsWith('.zip');
+  const showDaw = type === 'daw_template';
+
+  if (dawField) {
+    dawField.hidden = !showDaw;
+  }
+  if (dawSelect) {
+    dawSelect.disabled = !showDaw;
+    if (!showDaw) dawSelect.value = '';
+  }
+
+  const needsPreview =
+    type === 'daw_template' || type === 'sample_pack' || isZip;
+  if (previewField) {
+    previewField.hidden = !needsPreview;
+  }
+  if (previewInput) {
+    previewInput.required = needsPreview;
+  }
+}
+
 function bindUpload(): void {
+  const typeSelect = document.getElementById('upload-type');
+  const fileInput = document.getElementById('upload-file');
+  typeSelect?.addEventListener('change', updateUploadConditionalFields);
+  fileInput?.addEventListener('change', updateUploadConditionalFields);
+
   const form = document.getElementById('upload-form') as HTMLFormElement | null;
   form?.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -163,7 +232,23 @@ function bindUpload(): void {
       if (msg) msg.textContent = 'You must accept the producer agreement.';
       return;
     }
+
+    if (fd.get('type') !== 'daw_template') {
+      fd.delete('daw');
+    } else if (!fd.get('daw')) {
+      if (msg) msg.textContent = 'Select a DAW for template uploads.';
+      return;
+    }
+
+    const genreBoxes = form.querySelectorAll<HTMLInputElement>(
+      'input[name="genre"]:checked',
+    );
+    if (genreBoxes.length === 0) {
+      if (msg) msg.textContent = 'Select at least one genre.';
+      return;
+    }
     fd.set('agreementAccepted', 'true');
+    fd.set('genres', Array.from(genreBoxes).map((el) => el.value).join(','));
 
     if (msg) msg.textContent = 'Uploading…';
     const res = await fetch('/api/resources', {
@@ -181,14 +266,60 @@ function bindUpload(): void {
         'Upload accepted. Preview processing runs in the background — refresh search shortly.';
     }
     form.reset();
+    updateUploadConditionalFields();
     setTimeout(() => void runSearch(), 3000);
   });
+}
+
+async function initDiscovery(): Promise<void> {
+  const discoveryRoot = document.getElementById('discovery');
+  if (!discoveryRoot || window.location.pathname.startsWith('/artist/')) {
+    discoveryRoot?.setAttribute('hidden', '');
+    return;
+  }
+
+  const [genres, formats, bundles] = await Promise.all([
+    loadGenres(),
+    loadFormats(),
+    loadBundles(),
+  ]);
+
+  const genreDiscovery = document.getElementById('genre-discovery');
+  const formatDiscovery = document.getElementById('format-discovery');
+  const bundleDiscovery = document.getElementById('bundle-discovery');
+  const genreFilter = document.getElementById('genre') as HTMLSelectElement | null;
+  const genreCheckboxes = document.getElementById('genre-checkboxes');
+
+  if (genreFilter) {
+    for (const genre of genres) {
+      const opt = document.createElement('option');
+      opt.value = genre.slug;
+      opt.textContent = genre.name;
+      genreFilter.appendChild(opt);
+    }
+  }
+
+  if (genreCheckboxes) {
+    renderGenreCheckboxes(genreCheckboxes, genres);
+  }
+
+  if (genreDiscovery) {
+    renderGenreChips(genreDiscovery, genres, applyGenreFilter);
+  }
+  if (formatDiscovery) {
+    renderFormatCards(formatDiscovery, formats, applyFormatFilter);
+  }
+  if (bundleDiscovery) {
+    renderBundleStrip(bundleDiscovery, bundles);
+  }
 }
 
 function bindArtistRoute(): void {
   const path = window.location.pathname;
   const match = path.match(/^\/artist\/([^/]+)/);
   if (!match) return;
+
+  document.getElementById('discovery')?.setAttribute('hidden', '');
 
   const username = decodeURIComponent(match[1]!);
   const heading = document.getElementById('page-heading');
@@ -204,7 +335,7 @@ function bindArtistRoute(): void {
     }
     const data = (await res.json()) as {
       producer: Producer & { bio: string | null };
-      resources: import('./browse/resource-card.js').ResourceCardData[];
+      resources: ResourceCardData[];
     };
     if (heading) {
       heading.textContent = data.producer.displayName;
@@ -213,8 +344,7 @@ function bindArtistRoute(): void {
       status.textContent = data.producer.bio ?? `Royalty-free catalog · @${username}`;
     }
     if (grid) {
-      const { renderResourceGrid: render } = await import('./browse/resource-grid.js');
-      render(grid, data.resources);
+      renderResourceGrid(grid, data.resources);
     }
   })();
 }
@@ -223,11 +353,13 @@ async function init(): Promise<void> {
   bindSearch();
   bindAuth();
   bindUpload();
+  updateUploadConditionalFields();
   await refreshAuth();
 
   if (window.location.pathname.startsWith('/artist/')) {
     bindArtistRoute();
   } else {
+    await initDiscovery();
     await runSearch();
   }
 }

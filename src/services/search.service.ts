@@ -1,15 +1,18 @@
 import { sql } from 'drizzle-orm';
 import { db } from '../db/client.js';
-import type { LicenseType, ResourceType } from '../db/schema/index.js';
+import type { DawType, LicenseType, ResourceType } from '../db/schema/index.js';
 
 export interface SearchFilters {
   q?: string;
   type?: ResourceType;
+  types?: ResourceType[];
   bpmMin?: number;
   bpmMax?: number;
   key?: string;
   licenseType?: LicenseType;
   tags?: string[];
+  genres?: string[];
+  daw?: DawType;
   producerId?: string;
   limit?: number;
   offset?: number;
@@ -21,6 +24,7 @@ export interface SearchResultRow {
   title: string;
   description: string | null;
   type: ResourceType;
+  daw: DawType;
   preview_url: string | null;
   waveform_json_url: string | null;
   duration_ms: number | null;
@@ -28,6 +32,8 @@ export interface SearchResultRow {
   musical_key: string | null;
   license_type: LicenseType;
   price_cents: number | null;
+  regular_price_cents: number | null;
+  exclusive_price_cents: number | null;
   download_count: number;
   play_count: number;
   status: string;
@@ -35,18 +41,54 @@ export interface SearchResultRow {
   producer_username: string;
   producer_display_name: string;
   tags: string[] | null;
+  genres: string[] | null;
   rank: number;
 }
 
 const FTS_MIN_RESULTS = 5;
 
+const RESOURCE_SELECT = sql`
+  r.id,
+  r.producer_id,
+  r.title,
+  r.description,
+  r.type,
+  r.daw,
+  r.preview_url,
+  r.waveform_json_url,
+  r.duration_ms,
+  r.bpm,
+  r.musical_key,
+  r.license_type,
+  r.price_cents,
+  r.regular_price_cents,
+  r.exclusive_price_cents,
+  r.download_count,
+  r.play_count,
+  r.status,
+  r.created_at,
+  p.username AS producer_username,
+  p.display_name AS producer_display_name,
+  (
+    SELECT array_agg(rt.tag ORDER BY rt.tag)
+    FROM resource_tags rt
+    WHERE rt.resource_id = r.id
+  ) AS tags,
+  (
+    SELECT array_agg(rg.genre_slug ORDER BY rg.genre_slug)
+    FROM resource_genres rg
+    WHERE rg.resource_id = r.id
+  ) AS genres
+`;
+
 function buildFacetClauses(filters: SearchFilters): {
   clauses: ReturnType<typeof sql>[];
-  tagCount: number;
 } {
   const clauses: ReturnType<typeof sql>[] = [sql`r.status = 'approved'`];
 
-  if (filters.type) {
+  if (filters.types && filters.types.length > 0) {
+    clauses.push(sql`r.type = ANY(${filters.types})`);
+  } else if (filters.type) {
     clauses.push(sql`r.type = ${filters.type}`);
   }
   if (filters.bpmMin !== undefined) {
@@ -64,6 +106,9 @@ function buildFacetClauses(filters: SearchFilters): {
   if (filters.producerId) {
     clauses.push(sql`r.producer_id = ${filters.producerId}`);
   }
+  if (filters.daw) {
+    clauses.push(sql`r.daw = ${filters.daw}`);
+  }
 
   const tags = filters.tags ?? [];
   if (tags.length > 0) {
@@ -77,7 +122,19 @@ function buildFacetClauses(filters: SearchFilters): {
     `);
   }
 
-  return { clauses, tagCount: tags.length };
+  const genres = filters.genres ?? [];
+  if (genres.length > 0) {
+    clauses.push(sql`
+      (
+        SELECT count(DISTINCT rg.genre_slug)
+        FROM resource_genres rg
+        WHERE rg.resource_id = r.id
+          AND rg.genre_slug = ANY(${genres})
+      ) = ${genres.length}
+    `);
+  }
+
+  return { clauses };
 }
 
 function joinClauses(clauses: ReturnType<typeof sql>[]) {
@@ -124,29 +181,7 @@ export class SearchService {
 
     const rows = await db.execute(sql`
       SELECT
-        r.id,
-        r.producer_id,
-        r.title,
-        r.description,
-        r.type,
-        r.preview_url,
-        r.waveform_json_url,
-        r.duration_ms,
-        r.bpm,
-        r.musical_key,
-        r.license_type,
-        r.price_cents,
-        r.download_count,
-        r.play_count,
-        r.status,
-        r.created_at,
-        p.username AS producer_username,
-        p.display_name AS producer_display_name,
-        (
-          SELECT array_agg(rt.tag ORDER BY rt.tag)
-          FROM resource_tags rt
-          WHERE rt.resource_id = r.id
-        ) AS tags,
+        ${RESOURCE_SELECT},
         0::float AS rank
       FROM resources r
       INNER JOIN producers p ON p.id = r.producer_id
@@ -171,29 +206,7 @@ export class SearchService {
 
     const rows = await db.execute(sql`
       SELECT
-        r.id,
-        r.producer_id,
-        r.title,
-        r.description,
-        r.type,
-        r.preview_url,
-        r.waveform_json_url,
-        r.duration_ms,
-        r.bpm,
-        r.musical_key,
-        r.license_type,
-        r.price_cents,
-        r.download_count,
-        r.play_count,
-        r.status,
-        r.created_at,
-        p.username AS producer_username,
-        p.display_name AS producer_display_name,
-        (
-          SELECT array_agg(rt.tag ORDER BY rt.tag)
-          FROM resource_tags rt
-          WHERE rt.resource_id = r.id
-        ) AS tags,
+        ${RESOURCE_SELECT},
         ts_rank(r.search_vector, plainto_tsquery('english', ${query})) AS rank
       FROM resources r
       INNER JOIN producers p ON p.id = r.producer_id
@@ -213,7 +226,6 @@ export class SearchService {
     offset: number,
   ): Promise<SearchResultRow[]> {
     const { clauses } = buildFacetClauses(filters);
-    // Explicit threshold (default %> is 0.6 — too strict for short typos).
     clauses.push(sql`(
       word_similarity(${query}, r.title) > 0.2
       OR EXISTS (
@@ -221,40 +233,30 @@ export class SearchService {
         WHERE rt.resource_id = r.id
           AND word_similarity(${query}, rt.tag) > 0.2
       )
+      OR EXISTS (
+        SELECT 1 FROM resource_genres rg
+        INNER JOIN genres g ON g.slug = rg.genre_slug
+        WHERE rg.resource_id = r.id
+          AND word_similarity(${query}, g.name) > 0.2
+      )
     )`);
     const where = joinClauses(clauses);
 
     const rows = await db.execute(sql`
       SELECT
-        r.id,
-        r.producer_id,
-        r.title,
-        r.description,
-        r.type,
-        r.preview_url,
-        r.waveform_json_url,
-        r.duration_ms,
-        r.bpm,
-        r.musical_key,
-        r.license_type,
-        r.price_cents,
-        r.download_count,
-        r.play_count,
-        r.status,
-        r.created_at,
-        p.username AS producer_username,
-        p.display_name AS producer_display_name,
-        (
-          SELECT array_agg(rt.tag ORDER BY rt.tag)
-          FROM resource_tags rt
-          WHERE rt.resource_id = r.id
-        ) AS tags,
+        ${RESOURCE_SELECT},
         GREATEST(
           word_similarity(${query}, r.title),
           COALESCE((
             SELECT MAX(word_similarity(${query}, rt.tag))
             FROM resource_tags rt
             WHERE rt.resource_id = r.id
+          ), 0),
+          COALESCE((
+            SELECT MAX(word_similarity(${query}, g.name))
+            FROM resource_genres rg
+            INNER JOIN genres g ON g.slug = rg.genre_slug
+            WHERE rg.resource_id = r.id
           ), 0)
         ) AS rank
       FROM resources r

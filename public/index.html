@@ -6,7 +6,7 @@
   <title>Kanjava Music — Royalty-Free Samples & MIDI</title>
   <meta
     name="description"
-    content="Royalty-free sample, loop, MIDI, and preset marketplace for ghost producers. Producer retains copyright; you get a usage license with no ongoing royalties."
+    content="Royalty-free sample, loop, MIDI, DAW template, and stem marketplace. Producer retains copyright; you get a usage license with no ongoing royalties."
   />
   <link rel="stylesheet" href="/css/marketplace.css" />
 </head>
@@ -14,7 +14,7 @@
   <header class="site-header">
     <div class="site-header__inner">
       <a class="logo" href="/">Kanjava Music</a>
-      <p class="tagline">Royalty-free samples, loops &amp; MIDI for ghost producers</p>
+      <p class="tagline">Royalty-free production assets for ghost producers</p>
       <div class="auth-bar">
         <span id="auth-status">Not signed in</span>
         <button type="button" id="logout-btn" class="btn btn--ghost">Sign out</button>
@@ -25,7 +25,7 @@
   <main class="layout">
     <aside class="sidebar">
       <section class="panel" id="auth-forms">
-        <h2>Producer account</h2>
+        <h2>Account</h2>
         <p id="auth-message" class="message" role="status"></p>
 
         <form id="login-form" class="stack">
@@ -36,7 +36,7 @@
         </form>
 
         <form id="register-form" class="stack">
-          <h3>Register</h3>
+          <h3>Create account</h3>
           <label>Username <input name="username" required pattern="[a-z0-9_]{3,32}" /></label>
           <label>Display name <input name="displayName" required /></label>
           <label>Email <input name="email" type="email" required /></label>
@@ -58,14 +58,35 @@
           <label>Description <textarea name="description" rows="3"></textarea></label>
           <label>
             Type
-            <select name="type" required>
+            <select name="type" id="upload-type" required>
               <option value="sample">Sample</option>
               <option value="loop">Loop</option>
               <option value="midi">MIDI</option>
               <option value="preset">Preset</option>
               <option value="one_shot">One-shot</option>
+              <option value="daw_template">DAW Template</option>
+              <option value="stem">Stem</option>
+              <option value="sample_pack">Sample Pack</option>
+              <option value="vocal_pack">Vocal Pack</option>
             </select>
           </label>
+          <label id="daw-field" hidden>
+            DAW
+            <select name="daw" id="upload-daw">
+              <option value="">Select DAW…</option>
+              <option value="ableton_live">Ableton Live</option>
+              <option value="logic_pro">Logic Pro</option>
+              <option value="fl_studio">FL Studio</option>
+              <option value="cubase">Cubase</option>
+              <option value="studio_one">Studio One</option>
+              <option value="bitwig">Bitwig</option>
+              <option value="multi_daw">Multi-DAW</option>
+            </select>
+          </label>
+          <fieldset class="genre-fieldset">
+            <legend>Genres <span class="required">*</span></legend>
+            <div id="genre-checkboxes" class="genre-checkboxes"></div>
+          </fieldset>
           <label>
             License
             <select name="licenseType">
@@ -75,10 +96,21 @@
               <option value="cc_by">CC BY</option>
             </select>
           </label>
+          <div class="row">
+            <label>Regular price (¢) <input name="regularPriceCents" type="number" min="0" step="1" placeholder="optional" /></label>
+            <label>Exclusive price (¢) <input name="exclusivePriceCents" type="number" min="0" step="1" placeholder="optional" /></label>
+          </div>
           <label>BPM <input name="bpm" type="number" min="1" max="400" /></label>
           <label>Camelot key <input name="musicalKey" placeholder="8A" maxlength="8" /></label>
-          <label>Tags <input name="tags" placeholder="techno, acid" /></label>
-          <label>File <input name="file" type="file" required accept="audio/*,.mid,.midi,.wav,.mp3,.aiff,.flac" /></label>
+          <label>Style tags <input name="tags" placeholder="acid, analog" /></label>
+          <label>
+            File
+            <input name="file" id="upload-file" type="file" required accept="audio/*,.mid,.midi,.wav,.mp3,.aiff,.flac,.zip" />
+          </label>
+          <label id="preview-file-field" hidden>
+            Preview audio (required for zip uploads)
+            <input name="previewFile" id="upload-preview" type="file" accept="audio/*,.mp3,.wav,.aiff,.flac" />
+          </label>
           <label class="checkbox">
             <input name="agreementAccepted" type="checkbox" value="true" required />
             I accept the Producer Agreement (v1) and warrant I hold rights to license this work.
@@ -90,7 +122,7 @@
       <section class="panel">
         <h2>Filters</h2>
         <form id="search-form" class="stack">
-          <label>Search <input id="q" name="q" placeholder="kick, acid, pad…" /></label>
+          <label>Search <input id="q" name="q" placeholder="kick, house, pad…" /></label>
           <label>
             Type
             <select id="type" name="type">
@@ -100,6 +132,29 @@
               <option value="midi">MIDI</option>
               <option value="preset">Preset</option>
               <option value="one_shot">One-shot</option>
+              <option value="daw_template">DAW Template</option>
+              <option value="stem">Stem</option>
+              <option value="sample_pack">Sample Pack</option>
+              <option value="vocal_pack">Vocal Pack</option>
+            </select>
+          </label>
+          <label>
+            DAW
+            <select id="daw" name="daw">
+              <option value="">Any</option>
+              <option value="ableton_live">Ableton Live</option>
+              <option value="logic_pro">Logic Pro</option>
+              <option value="fl_studio">FL Studio</option>
+              <option value="cubase">Cubase</option>
+              <option value="studio_one">Studio One</option>
+              <option value="bitwig">Bitwig</option>
+              <option value="multi_daw">Multi-DAW</option>
+            </select>
+          </label>
+          <label>
+            Genre
+            <select id="genre" name="genre">
+              <option value="">Any</option>
             </select>
           </label>
           <div class="row">
@@ -117,7 +172,8 @@
               <option value="cc_by">CC BY</option>
             </select>
           </label>
-          <label>Tags <input id="tags" placeholder="techno, acid" /></label>
+          <label>Style tags <input id="tags" placeholder="acid, analog" /></label>
+          <input type="hidden" id="format" name="format" />
           <div class="row">
             <button type="submit" class="btn">Search</button>
             <button type="button" id="clear-filters" class="btn btn--ghost">Clear</button>
@@ -127,6 +183,12 @@
     </aside>
 
     <section class="content">
+      <div id="discovery" class="discovery">
+        <section id="genre-discovery" class="discovery__section"></section>
+        <section id="format-discovery" class="discovery__section"></section>
+        <section id="bundle-discovery" class="discovery__section"></section>
+      </div>
+
       <header class="content-header">
         <h1 id="page-heading">Browse</h1>
         <p id="search-status" class="message">Loading…</p>

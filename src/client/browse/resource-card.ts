@@ -5,11 +5,14 @@ export interface ResourceCardData {
   id: string;
   title: string;
   type: string;
+  daw?: string;
   previewUrl: string | null;
   waveformJsonUrl: string | null;
   bpm: number | null;
   musicalKey: string | null;
   licenseType: string;
+  regularPriceCents?: number | null;
+  exclusivePriceCents?: number | null;
   downloadCount: number;
   playCount: number;
   producer: {
@@ -17,7 +20,30 @@ export interface ResourceCardData {
     displayName: string;
   };
   tags: string[];
+  genres?: string[];
 }
+
+const TYPE_LABELS: Record<string, string> = {
+  sample: 'Sample',
+  loop: 'Loop',
+  midi: 'MIDI',
+  preset: 'Preset',
+  one_shot: 'One-shot',
+  daw_template: 'DAW Template',
+  stem: 'Stem',
+  sample_pack: 'Sample Pack',
+  vocal_pack: 'Vocal Pack',
+};
+
+const DAW_LABELS: Record<string, string> = {
+  ableton_live: 'Ableton Live',
+  logic_pro: 'Logic Pro',
+  fl_studio: 'FL Studio',
+  cubase: 'Cubase',
+  studio_one: 'Studio One',
+  bitwig: 'Bitwig',
+  multi_daw: 'Multi-DAW',
+};
 
 function licenseLabel(licenseType: string): string {
   switch (licenseType) {
@@ -34,18 +60,47 @@ function licenseLabel(licenseType: string): string {
   }
 }
 
+function formatPrice(cents: number): string {
+  return `$${(cents / 100).toFixed(2)}`;
+}
+
+function typeLabel(type: string, daw?: string): string {
+  const base = TYPE_LABELS[type] ?? type.replace(/_/g, ' ');
+  if (type === 'daw_template' && daw && daw !== 'not_applicable') {
+    return `${DAW_LABELS[daw] ?? daw} Template`;
+  }
+  return base;
+}
+
 export function createResourceCard(resource: ResourceCardData): HTMLElement {
   const card = document.createElement('article');
   card.className = 'resource-card';
   card.dataset.id = resource.id;
 
   const meta = [
-    resource.type.replace('_', ' '),
+    typeLabel(resource.type, resource.daw),
     resource.bpm ? `${resource.bpm} BPM` : null,
     resource.musicalKey,
   ]
     .filter(Boolean)
     .join(' · ');
+
+  const hasRegular =
+    resource.regularPriceCents !== null &&
+    resource.regularPriceCents !== undefined &&
+    resource.regularPriceCents > 0;
+  const hasExclusive =
+    resource.exclusivePriceCents !== null &&
+    resource.exclusivePriceCents !== undefined &&
+    resource.exclusivePriceCents > 0;
+
+  let priceHtml = '';
+  if (hasRegular || hasExclusive) {
+    const parts: string[] = [];
+    if (hasRegular) parts.push(`Regular ${formatPrice(resource.regularPriceCents!)}`);
+    if (hasExclusive) parts.push(`Exclusive ${formatPrice(resource.exclusivePriceCents!)}`);
+    priceHtml = `<p class="resource-card__pricing">${parts.join(' · ')}</p>`;
+  }
 
   card.innerHTML = `
     <div class="resource-card__header">
@@ -60,12 +115,14 @@ export function createResourceCard(resource: ResourceCardData): HTMLElement {
         </p>
       </div>
     </div>
+    ${priceHtml}
     <canvas class="resource-card__waveform" height="48"></canvas>
     <div class="resource-card__footer">
       <span class="badge badge--license"></span>
       <span class="resource-card__stats"></span>
       <button type="button" class="btn btn--small download-btn">Download</button>
     </div>
+    <div class="resource-card__badges"></div>
     <div class="resource-card__tags"></div>
   `;
 
@@ -80,6 +137,20 @@ export function createResourceCard(resource: ResourceCardData): HTMLElement {
   );
   card.querySelector('.resource-card__stats')!.textContent =
     `${resource.playCount} plays · ${resource.downloadCount} downloads`;
+
+  const badgesEl = card.querySelector('.resource-card__badges')!;
+  if (resource.daw && resource.daw !== 'not_applicable' && resource.type !== 'daw_template') {
+    const dawBadge = document.createElement('span');
+    dawBadge.className = 'badge badge--daw';
+    dawBadge.textContent = DAW_LABELS[resource.daw] ?? resource.daw;
+    badgesEl.appendChild(dawBadge);
+  }
+  for (const genre of resource.genres ?? []) {
+    const span = document.createElement('span');
+    span.className = 'badge badge--genre';
+    span.textContent = genre.replace(/_/g, ' ');
+    badgesEl.appendChild(span);
+  }
 
   const tagsEl = card.querySelector('.resource-card__tags')!;
   for (const tag of resource.tags) {
@@ -152,7 +223,6 @@ export function createResourceCard(resource: ResourceCardData): HTMLElement {
       downloadBtn.disabled = false;
     }
   });
-
 
   return card;
 }

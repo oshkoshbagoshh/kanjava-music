@@ -12,6 +12,7 @@ import {
 } from 'drizzle-orm/pg-core';
 import { downloads } from './downloads.js';
 import { producers } from './producers.js';
+import { resourceGenres } from './resource-genres.js';
 import { resourceTags } from './resource-tags.js';
 import { uploadAgreements } from './upload-agreements.js';
 
@@ -21,6 +22,21 @@ export const resourceTypeEnum = pgEnum('resource_type', [
   'midi',
   'preset',
   'one_shot',
+  'daw_template',
+  'stem',
+  'sample_pack',
+  'vocal_pack',
+]);
+
+export const dawTypeEnum = pgEnum('daw_type', [
+  'ableton_live',
+  'logic_pro',
+  'fl_studio',
+  'cubase',
+  'studio_one',
+  'bitwig',
+  'multi_daw',
+  'not_applicable',
 ]);
 
 export const licenseTypeEnum = pgEnum('license_type', [
@@ -61,7 +77,10 @@ export const resources = pgTable(
     bpm: integer('bpm'),
     musicalKey: varchar('musical_key', { length: 8 }),
     licenseType: licenseTypeEnum('license_type').notNull().default('royalty_free_standard'),
+    daw: dawTypeEnum('daw').notNull().default('not_applicable'),
     priceCents: integer('price_cents'),
+    regularPriceCents: integer('regular_price_cents'),
+    exclusivePriceCents: integer('exclusive_price_cents'),
     downloadCount: integer('download_count').notNull().default(0),
     playCount: integer('play_count').notNull().default(0),
     fingerprintHash: varchar('fingerprint_hash', { length: 128 }),
@@ -75,6 +94,7 @@ export const resources = pgTable(
     index('resources_bpm_idx').on(table.bpm),
     index('resources_musical_key_idx').on(table.musicalKey),
     index('resources_type_idx').on(table.type),
+    index('resources_daw_idx').on(table.daw),
     index('resources_producer_id_idx').on(table.producerId),
     index('resources_file_hash_idx').on(table.fileHash),
     index('resources_search_vector_idx').using('gin', table.searchVector),
@@ -88,6 +108,7 @@ export const resourcesRelations = relations(resources, ({ one, many }) => ({
     references: [producers.id],
   }),
   tags: many(resourceTags),
+  genres: many(resourceGenres),
   downloads: many(downloads),
   uploadAgreements: many(uploadAgreements),
 }));
@@ -97,3 +118,4 @@ export type NewResource = typeof resources.$inferInsert;
 export type ResourceType = (typeof resourceTypeEnum.enumValues)[number];
 export type LicenseType = (typeof licenseTypeEnum.enumValues)[number];
 export type ResourceStatus = (typeof resourceStatusEnum.enumValues)[number];
+export type DawType = (typeof dawTypeEnum.enumValues)[number];
