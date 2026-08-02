@@ -1,11 +1,15 @@
 import type { Metadata } from 'next';
 import { SiteHeader } from '@/components/SiteHeader';
+import { site } from '@/lib/site-content';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Kanjava Music — Royalty-Free Samples & MIDI',
+  title: {
+    default: `${site.name} — Original radio & royalty-free production assets`,
+    template: `%s · ${site.name}`,
+  },
   description:
-    'Royalty-free sample, loop, MIDI, DAW template, and stem marketplace. Producer retains copyright; you get a usage license with no ongoing royalties.',
+    'Kanjava Music: slow-burn passion project by @kanjavamusic — exclusive original Kanjava Radio mixes on-site, plus a royalty-free marketplace for producers.',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
