@@ -2,6 +2,80 @@
 
 Architecture, local development, and operational workflows for Kanjava Music.
 
+## Phase 0 — local-only crate mode
+
+Phase 0 is a local-first foundation for organizing production assets and DJ crates without the full marketplace stack.
+
+### Goals
+
+- Run on one machine or external USB drive
+- Keep the full library portable inside one folder
+- Use SQLite for metadata storage (single `.sqlite` file in the library root)
+- Use local filesystem storage for files and generated/cache data
+- Prefer Node.js built-ins: `os`, `process`, `path`, `fs`, `crypto`
+- Avoid required services: Postgres, Redis, Docker, S3, worker queues, auth
+- Scaffold a folder layout understandable without opening the app
+- Include offline-readable identity files for handoff and lost-USB recovery
+
+### Suggested local library layout
+
+```text
+KANJAVA_USB/
+  README.txt
+  CHANGELOG.txt
+  CONTACT.txt
+  PRODUCER-CARD.txt
+  PRODUCER-CARD.vcf
+  kanjava-library.sqlite
+  library.json
+  originals/
+    audio/
+    midi/
+    packs/
+  previews/
+  waveforms/
+  crates/
+  exports/
+  artwork/
+  documents/
+  inbox/
+  logs/
+```
+
+Templates: [docs/book/samples/](book/samples/) and [docs/book/templates/](book/templates/).
+
+### SQLite metadata model (Phase 0)
+
+| Table | Purpose |
+|-------|---------|
+| `assets` | Imported files and metadata |
+| `crates` | DJ-style collections |
+| `crate_assets` | Ordered assets in crates |
+| `tags` / `asset_tags` | Local tags |
+| `producer_profile` | Local producer card data |
+| `library_events` | Changelog / update history |
+| `scan_runs` | Optional import history |
+
+Store **relative paths** from the library root. The producer card in SQLite should stay in sync with `PRODUCER-CARD.txt` / `.vcf` when the app updates profile fields.
+
+### Local-only services
+
+| Concern | Phase 0 approach |
+|---------|------------------|
+| Database | SQLite file in library root |
+| Storage | Relative paths under library root |
+| Search | SQLite queries/indexes |
+| Deduplication | SHA-256 via `crypto` |
+| Crates | SQLite + optional folders under `crates/` |
+| Changelog | `library_events` + top-level `CHANGELOG.txt` |
+| Identity | `producer_profile` + producer card files |
+
+### Scope boundary
+
+Phase 0 does **not** require: user accounts, JWT, PostgreSQL, Redis, BullMQ, Docker, S3, cloud processing, marketplace publishing, payments, or admin moderation.
+
+Implementation narrative and pass/fail chapter tests: [docs/book/README.md](book/README.md).
+
 ## Stack
 
 | Layer | Technology |
