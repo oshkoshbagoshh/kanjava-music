@@ -37,6 +37,7 @@ By the end of this chapter, you will understand:
 - [ ] TODO: Deliverable 1
 - [ ] TODO: Deliverable 2
 - [ ] TODO: Deliverable 3
+- [ ] **Release 1:** Vercel deploy via Next.js stub in `apps/web` (no Postgres on serverless). **Release 2:** full Route Handler port + Blob uploads + media worker — see [docs/next-migration.md](../../../next-migration.md).
 
 ## Final result
 

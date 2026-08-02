@@ -89,6 +89,24 @@ npm run dev:worker   # waveform / preview worker (separate terminal)
 | `npm run db:migrate` | Apply SQL migrations |
 | `npm run db:seed` | Seed sample bundles (requires approved resources) |
 | `npm test` | Unit tests (Vitest) |
+| `npm run dev:web` | Next.js Vercel stub (`apps/web`, port 3001) |
+
+## Vercel (Release 1 stub)
+
+Production on Vercel uses the **Next.js stub** in [`apps/web`](apps/web), not the Express server.
+
+| Setting | Value |
+|---------|--------|
+| Root Directory | `apps/web` |
+| Env vars | None required for stub |
+
+The stub serves home/browse/upload placeholders and empty stub APIs. **Auth, search, uploads, and previews** still require the full stack via Docker locally. See [docs/next-migration.md](docs/next-migration.md) for Release 2 (Neon, Blob, Workflow/worker).
+
+```bash
+npm install
+npm run dev:web
+# http://localhost:3001 — stub health at /api/health
+```
 
 ## Documentation
 
@@ -99,6 +117,7 @@ npm run dev:worker   # waveform / preview worker (separate terminal)
 | [docs/developer-guide.md](docs/developer-guide.md) | Architecture and local development |
 | [docs/producer-upload-guide.md](docs/producer-upload-guide.md) | Uploading resources |
 | [docs/phase2-catalog.md](docs/phase2-catalog.md) | Phase 2 catalog expansion |
+| [docs/next-migration.md](docs/next-migration.md) | Next.js on Vercel (Release 1 stub → Release 2 plan) |
 | [docs/book/README.md](docs/book/README.md) | Building Kanjava Music — blog/eBook chapters and completion tests |
 
 ## Phase 1 scope

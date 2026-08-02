@@ -10,6 +10,7 @@ Royalty-free production asset marketplace for ghost producers. Producers retain 
 | [Developer Guide](developer-guide.md) | Architecture, local setup, migrations, workers, testing |
 | [Producer Upload Guide](producer-upload-guide.md) | How to upload each resource type and avoid common errors |
 | [Phase 2 Catalog](phase2-catalog.md) | Catalog expansion features, discovery UI, and scope boundaries |
+| [Next.js / Vercel migration](next-migration.md) | Release 1 stub (`apps/web`) and Release 2 full port plan |
 | [Building Kanjava Music (book)](book/README.md) | Blog/eBook chapter series, branch map, pass/fail chapter tests |
 
 ## Related documents

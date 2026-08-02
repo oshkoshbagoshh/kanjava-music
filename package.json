@@ -4,6 +4,9 @@
   "private": true,
   "description": "Royalty-free sample/MIDI marketplace for ghost producers",
   "type": "module",
+  "workspaces": [
+    "apps/web"
+  ],
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "dev:worker": "tsx watch src/workers/waveform.worker.ts",
@@ -18,7 +21,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "book:scaffold": "node scripts/scaffold-book-chapters.mjs",
-    "book:verify": "node scripts/verify-book-scaffold.mjs"
+    "book:verify": "node scripts/verify-book-scaffold.mjs",
+    "dev:web": "npm run dev -w @kanjava/web",
+    "build:web": "npm run build -w @kanjava/web"
   },
   "engines": {
     "node": ">=20"
