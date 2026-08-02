@@ -8,7 +8,7 @@ export function HeroSection() {
         <p className="kanjava-hero-mood" aria-hidden="true">
           {site.mood}
         </p>
-        <p className="subtitle has-text-success has-text-weight-semibold">{ghostBrand.headline}</p>
+        <p className="subtitle has-text-primary has-text-weight-semibold">{ghostBrand.headline}</p>
         <h1 className="title is-2">{site.name}</h1>
         <p className="subtitle is-5">{site.tagline}</p>
         <div className="content">

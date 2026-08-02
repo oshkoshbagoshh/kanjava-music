@@ -1,12 +1,12 @@
 @use "palette" as p;
 
-// Dark theme atmosphere (Bulma theme-dark + custom gradient)
+// Dark theme atmosphere (Bulma theme-dark + kit-green depth)
 html.theme-dark {
   --kanjava-gradient: linear-gradient(
     160deg,
     #{p.$kanjava-ink} 0%,
-    #2c3338 50%,
-    #1f3a36 100%
+    #1a2e22 45%,
+    #0d3d24 100%
   );
 }
 
@@ -18,18 +18,24 @@ body.kanjava-body {
 
 .kanjava-navbar {
   backdrop-filter: blur(8px);
-  background-color: rgba(26, 29, 31, 0.92) !important;
+  background-color: rgba(26, 26, 26, 0.94) !important;
   border-bottom: 1px solid p.$kanjava-panel-border;
 }
 
 .kanjava-box-accent {
-  border: 1px solid p.$kanjava-success;
-  background-color: rgba(112, 174, 110, 0.08);
+  border: 1px solid p.$kanjava-primary;
+  background-color: rgba(16, 139, 58, 0.1);
+}
+
+.kanjava-flag-accent {
+  border-top: 4px solid p.$kanjava-flag-green;
+  box-shadow: inset 0 3px 0 0 p.$kanjava-flag-white, inset 0 6px 0 0 p.$kanjava-flag-red;
 }
 
 .kanjava-memorial {
-  border-left: 4px solid p.$kanjava-info;
+  border-left: 4px solid p.$kanjava-flag-red;
   padding-left: 1rem;
+  background-color: rgba(218, 41, 28, 0.06);
 }
 
 .kanjava-hero-mood {
@@ -48,7 +54,11 @@ body.kanjava-body {
 }
 
 .content a {
-  color: p.$kanjava-primary;
+  color: lighten(p.$kanjava-primary, 8%);
+}
+
+.content a:hover {
+  color: p.$kanjava-white;
 }
 
 .notification.is-kanjava-stub {
@@ -93,5 +103,29 @@ p.is-muted {
 }
 
 .navbar.is-dark .navbar-item:hover {
-  background-color: rgba(255, 255, 255, 0.06);
+  background-color: rgba(16, 139, 58, 0.15);
+}
+
+.button.is-primary {
+  background-color: p.$kanjava-primary;
+  border-color: transparent;
+  color: p.$kanjava-white;
+}
+
+.button.is-primary:hover {
+  background-color: p.$kanjava-info;
+}
+
+.tag.is-primary {
+  background-color: p.$kanjava-primary;
+  color: p.$kanjava-white;
+}
+
+.tag.is-info {
+  background-color: p.$kanjava-info;
+  color: p.$kanjava-white;
+}
+
+.has-text-primary {
+  color: lighten(p.$kanjava-primary, 12%) !important;
 }

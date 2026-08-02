@@ -1,17 +1,23 @@
-// Kanjava / Ghost palette — Persian-inspired accents on existing marketplace tokens.
-// Inspiration: lapis & turquoise (Persian blue), saffron gold, night sky, tile ceramics.
+// Kanjava / Ghost palette — Iranian flag & national kit inspiration (green, white, red).
+// Emerald jersey green as primary; crisp white; flag red for sparing accents.
 // Cultural celebration — not political messaging.
 
-$kanjava-primary: #00d4ff; // sky aqua — CTAs, links
-$kanjava-info: #2a9d8f; // lapis / turquoise
-$kanjava-success: #70ae6e; // sage
-$kanjava-warning: #e9c46a; // saffron gold
-$kanjava-danger: #c1121f; // pomegranate / tile accent (sparingly)
+$kanjava-primary: #108b3a; // emerald kit green — CTAs, links, brand
+$kanjava-white: #ffffff;
+$kanjava-danger: #da291c; // flag red — accents, tags (use sparingly)
+$kanjava-info: #239b4f; // lighter green highlight
+$kanjava-success: #108b3a; // align with primary
+$kanjava-warning: #e9c46a; // stub / notice only (saffron)
 
-$kanjava-ink: #1a1d1f;
-$kanjava-panel: #2a2e31;
-$kanjava-panel-border: #4a5054;
-$kanjava-text: #e8ecef;
-$kanjava-muted: #9aa3a8;
+$kanjava-ink: #1a1a1a; // stadium shadow / deep dark
+$kanjava-panel: #242824; // green-tinted dark surface
+$kanjava-panel-border: #3d4a3f;
+$kanjava-text: #f5f7f5; // near-white on dark
+$kanjava-muted: #a8b5aa;
 
 $kanjava-radius: 10px;
+
+// Flag tricolor (heritage accents)
+$kanjava-flag-green: $kanjava-primary;
+$kanjava-flag-white: $kanjava-white;
+$kanjava-flag-red: $kanjava-danger;

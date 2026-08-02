@@ -4,7 +4,7 @@ import { persianHeritage } from '@/lib/site-content';
 export default function HeritagePage() {
   return (
     <>
-      <div className="box kanjava-box-accent mb-4">
+      <div className="box kanjava-box-accent kanjava-flag-accent mb-4">
         <h1 className="title is-3">{persianHeritage.title}</h1>
         <div className="content">
           <p>{persianHeritage.intro}</p>
