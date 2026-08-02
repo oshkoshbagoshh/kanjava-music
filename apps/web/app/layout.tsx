@@ -5,11 +5,11 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: {
-    default: `${site.name} — Original radio & royalty-free production assets`,
+    default: `${site.name} — Ghost ecosystem for creative mastery`,
     template: `%s · ${site.name}`,
   },
   description:
-    'Kanjava Music: slow-burn passion project by @kanjavamusic — exclusive original Kanjava Radio mixes on-site, plus a royalty-free marketplace for producers.',
+    'Open-source ecosystem for creative mastery: Ghost Marketplace collaboration, Kanjava Radio originals, slow-burn build in public.',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

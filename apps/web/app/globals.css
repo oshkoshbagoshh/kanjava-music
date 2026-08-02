@@ -332,3 +332,73 @@ code {
   border-radius: 4px;
 }
 
+.hero__eyebrow {
+  margin: 0 0 0.35rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--sage-green);
+  text-transform: none;
+  letter-spacing: 0.01em;
+}
+
+.hero__ecosystem {
+  margin: 0 0 1rem;
+  font-size: 0.8rem;
+}
+
+.philosophy-lead {
+  font-size: 1.05rem;
+  line-height: 1.5;
+}
+
+.philosophy-block h2 {
+  margin-top: 0;
+}
+
+.philosophy-list {
+  line-height: 1.55;
+  padding-left: 1.25rem;
+}
+
+.philosophy-list--compact li {
+  margin-bottom: 0.35rem;
+}
+
+.philosophy-teaser h2 {
+  margin-top: 0;
+}
+
+.ecosystem-grid {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+@media (min-width: 700px) {
+  .ecosystem-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.ecosystem-card {
+  background: var(--ink);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius);
+  padding: 1rem;
+  list-style: none;
+}
+
+.ecosystem-card__title {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.ecosystem-card__role {
+  margin: 0.35rem 0;
+  color: var(--sky-aqua);
+  font-size: 0.9rem;
+}
+
+

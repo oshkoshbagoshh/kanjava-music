@@ -11,6 +11,8 @@ export function SiteHeader() {
         <p className="tagline">{site.tagline}</p>
         <nav className="site-nav" aria-label="Main">
           <Link href="/">Home</Link>
+          <Link href="/philosophy">Philosophy</Link>
+          <Link href="/ecosystem">Ecosystem</Link>
           <Link href="/radio">Radio</Link>
           <Link href="/browse">Browse</Link>
           <Link href="/about">About</Link>

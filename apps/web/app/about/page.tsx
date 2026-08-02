@@ -24,7 +24,8 @@ export default function AboutPage() {
           <strong>Kanjava Radio</strong> mixes are a separate series—original material published
           only on kanjava.com (this project).
         </p>
-        <Link href="/radio">Go to Kanjava Radio</Link>
+        <Link href="/radio">Go to Kanjava Radio</Link> ·{' '}
+        <Link href="/philosophy">Ghost philosophy</Link> · <Link href="/ecosystem">Ecosystem</Link>
       </section>
 
       <section className="panel">
