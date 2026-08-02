@@ -23,7 +23,8 @@
     "book:scaffold": "node scripts/scaffold-book-chapters.mjs",
     "book:verify": "node scripts/verify-book-scaffold.mjs",
     "dev:web": "npm run dev -w @kanjava/web",
-    "build:web": "npm run build -w @kanjava/web"
+    "build:web": "npm run build -w @kanjava/web",
+    "vercel-build": "npm run build -w @kanjava/web"
   },
   "engines": {
     "node": ">=20"

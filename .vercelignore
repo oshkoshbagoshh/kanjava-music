@@ -1,0 +1,8 @@
+# Monorepo: production deploy is Next.js in apps/web only.
+src
+docker
+docker-compose.yml
+Dockerfile
+public/js
+public/index.html
+zzWIP
