@@ -16,7 +16,9 @@
     "db:seed": "tsx src/db/seed.ts",
     "db:studio": "drizzle-kit studio",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "book:scaffold": "node scripts/scaffold-book-chapters.mjs",
+    "book:verify": "node scripts/verify-book-scaffold.mjs"
   },
   "engines": {
     "node": ">=20"

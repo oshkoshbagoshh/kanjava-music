@@ -4,6 +4,18 @@ Royalty-free sample / MIDI marketplace for ghost producers.
 
 Producers retain copyright; buyers get a usage license with no ongoing royalty obligation.
 
+## Phase 0 scope — fully local crate mode
+
+Phase 0 is a dependency-light, local-first mode for DJs, producers, and collectors who want to organize music assets on one machine or an external USB drive.
+
+- SQLite metadata file inside the library folder (portable drives; implementation may use a small npm SQLite binding—no Postgres/Redis/Docker/S3)
+- Local filesystem for originals, previews, waveforms, crates, and exports
+- Human-readable top-level files: `README.txt`, `CHANGELOG.txt`, `CONTACT.txt`, `PRODUCER-CARD.txt`, `PRODUCER-CARD.vcf`
+- Node.js core APIs where possible: `os`, `process`, `path`, `fs`, `crypto`
+- DJ-style crate organization without marketplace auth or cloud jobs
+
+Phase 0 stays separate from the Phase 1+ marketplace backend. See [docs/developer-guide.md](docs/developer-guide.md#phase-0--local-only-crate-mode) and the chapter series in [docs/book/README.md](docs/book/README.md).
+
 ## Stack
 
 | Layer | Choice |
@@ -87,6 +99,7 @@ npm run dev:worker   # waveform / preview worker (separate terminal)
 | [docs/developer-guide.md](docs/developer-guide.md) | Architecture and local development |
 | [docs/producer-upload-guide.md](docs/producer-upload-guide.md) | Uploading resources |
 | [docs/phase2-catalog.md](docs/phase2-catalog.md) | Phase 2 catalog expansion |
+| [docs/book/README.md](docs/book/README.md) | Building Kanjava Music — blog/eBook chapters and completion tests |
 
 ## Phase 1 scope
 

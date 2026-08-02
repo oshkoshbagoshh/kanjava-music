@@ -1,0 +1,13 @@
+KANJAVA USB CHANGELOG
+=====================
+
+YYYY-MM-DD
+  Created local library
+  Added initial producer card
+  Imported first music files
+  Created starter crate: crates/YYYY-MM-example/
+
+YYYY-MM-DD
+  Updated contact info
+  Added new previews
+  Exported promo crate

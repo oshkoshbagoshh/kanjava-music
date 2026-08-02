@@ -1,0 +1,22 @@
+PRODUCER CARD
+=============
+
+Stage Name:
+Display Name:
+Primary Genre:
+Secondary Genres:
+Location:
+Email:
+Website:
+Instagram:
+SoundCloud:
+YouTube:
+Bandcamp:
+Marketplace Profile: (future)
+
+Short Bio:
+
+License / Usage Notes:
+  This library may contain previews, demos, works in progress, samples,
+  loops, MIDI, stems, or production assets. Do not redistribute unless
+  explicitly licensed.

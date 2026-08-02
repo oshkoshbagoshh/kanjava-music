@@ -1,0 +1,10 @@
+BEGIN:VCARD
+VERSION:3.0
+FN:Example Producer
+N:Producer;Example;;;
+ORG:Kanjava Music
+TITLE:Producer / DJ
+EMAIL:producer@example.com
+URL:https://example.com
+NOTE:Portable Kanjava Music producer card.
+END:VCARD
