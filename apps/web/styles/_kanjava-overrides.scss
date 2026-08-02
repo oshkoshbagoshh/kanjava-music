@@ -1,0 +1,131 @@
+@use "palette" as p;
+
+// Dark theme atmosphere (Bulma theme-dark + kit-green depth)
+html.theme-dark {
+  --kanjava-gradient: linear-gradient(
+    160deg,
+    #{p.$kanjava-ink} 0%,
+    #1a2e22 45%,
+    #0d3d24 100%
+  );
+}
+
+body.kanjava-body {
+  min-height: 100vh;
+  background: var(--kanjava-gradient);
+  color: p.$kanjava-text;
+}
+
+.kanjava-navbar {
+  backdrop-filter: blur(8px);
+  background-color: rgba(26, 26, 26, 0.94) !important;
+  border-bottom: 1px solid p.$kanjava-panel-border;
+}
+
+.kanjava-box-accent {
+  border: 1px solid p.$kanjava-primary;
+  background-color: rgba(16, 139, 58, 0.1);
+}
+
+.kanjava-flag-accent {
+  border-top: 4px solid p.$kanjava-flag-green;
+  box-shadow: inset 0 3px 0 0 p.$kanjava-flag-white, inset 0 6px 0 0 p.$kanjava-flag-red;
+}
+
+.kanjava-memorial {
+  border-left: 4px solid p.$kanjava-flag-red;
+  padding-left: 1rem;
+  background-color: rgba(218, 41, 28, 0.06);
+}
+
+.kanjava-hero-mood {
+  font-size: 1.5rem;
+  opacity: 0.85;
+}
+
+.kanjava-tagline {
+  color: p.$kanjava-muted;
+  font-size: 0.85rem;
+  max-width: 28rem;
+}
+
+.navbar-item.is-active {
+  color: p.$kanjava-primary !important;
+}
+
+.content a {
+  color: lighten(p.$kanjava-primary, 8%);
+}
+
+.content a:hover {
+  color: p.$kanjava-white;
+}
+
+.notification.is-kanjava-stub {
+  background-color: rgba(233, 196, 106, 0.12);
+  border: 1px solid p.$kanjava-warning;
+  color: p.$kanjava-text;
+}
+
+.box,
+.card {
+  background-color: p.$kanjava-panel;
+  color: p.$kanjava-text;
+  border: 1px solid p.$kanjava-panel-border;
+  border-radius: p.$kanjava-radius;
+}
+
+.title,
+.subtitle,
+.content,
+.label,
+.card-header-title {
+  color: p.$kanjava-text;
+}
+
+.subtitle.is-muted,
+.content .is-muted,
+p.is-muted {
+  color: p.$kanjava-muted !important;
+}
+
+.input,
+.textarea,
+.select select {
+  background-color: p.$kanjava-ink;
+  border-color: p.$kanjava-panel-border;
+  color: p.$kanjava-text;
+}
+
+.navbar.is-dark .navbar-item,
+.navbar.is-dark .navbar-link {
+  color: p.$kanjava-text;
+}
+
+.navbar.is-dark .navbar-item:hover {
+  background-color: rgba(16, 139, 58, 0.15);
+}
+
+.button.is-primary {
+  background-color: p.$kanjava-primary;
+  border-color: transparent;
+  color: p.$kanjava-white;
+}
+
+.button.is-primary:hover {
+  background-color: p.$kanjava-info;
+}
+
+.tag.is-primary {
+  background-color: p.$kanjava-primary;
+  color: p.$kanjava-white;
+}
+
+.tag.is-info {
+  background-color: p.$kanjava-info;
+  color: p.$kanjava-white;
+}
+
+.has-text-primary {
+  color: lighten(p.$kanjava-primary, 12%) !important;
+}
