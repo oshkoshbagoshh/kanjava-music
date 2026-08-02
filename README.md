@@ -97,8 +97,14 @@ Production on Vercel uses the **Next.js stub** in [`apps/web`](apps/web), not th
 
 | Setting | Value |
 |---------|--------|
-| Root Directory | `apps/web` |
-| Env vars | None required for stub |
+| **Root Directory** | `apps/web` (required — set in Vercel → Project → Settings → General) |
+| **Framework** | Next.js |
+| **Build Command** | `npm run build` (default inside `apps/web`) or root `npm run build:web` if Root Directory is repo root |
+| **Env vars** | None required for stub |
+
+If you see `FUNCTION_INVOCATION_FAILED`, the project is almost certainly building the **Express** app at repo root. Set **Root Directory** to `apps/web`, redeploy, and confirm `GET /api/health` returns `{"ok":true,"mode":"stub"}`.
+
+Root [`vercel.json`](vercel.json) and `vercel-build` script support building from the monorepo when Root Directory is `.`.
 
 The stub serves home/browse/upload placeholders and empty stub APIs. **Auth, search, uploads, and previews** still require the full stack via Docker locally. See [docs/next-migration.md](docs/next-migration.md) for Release 2 (Neon, Blob, Workflow/worker).
 
