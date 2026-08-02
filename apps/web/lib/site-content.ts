@@ -178,6 +178,40 @@ export const person = {
   ],
 } as const;
 
+export const persianHeritage = {
+  title: 'Ancient Persia & heritage',
+  intro:
+    'Kanjava is built by an Iranian American creator. This is not a place for politics—it is a small invitation to celebrate one of the world’s oldest continuous cultures and to learn about its rich history.',
+  body: [
+    'Persia’s legacy spans poetry, mathematics, astronomy, architecture, and music that still echoes in modern production. Taking a few minutes to explore that history is one way we honor where we come from while we build something new.',
+    'If you are curious, start with neutral, educational resources below—museums, UNESCO, and overview histories—not hot takes.',
+  ],
+  learnMoreLinks: [
+    {
+      label: 'History of Iran (overview)',
+      href: 'https://en.wikipedia.org/wiki/History_of_Iran',
+      description: 'Broad historical timeline',
+    },
+    {
+      label: 'Persepolis (UNESCO)',
+      href: 'https://whc.unesco.org/en/list/114/',
+      description: 'World Heritage site — Achaemenid capital',
+    },
+    {
+      label: 'The Met — Persian art',
+      href: 'https://www.metmuseum.org/about-the-met/collection-areas/islamic-art',
+      description: 'Islamic art collection including Persian works',
+    },
+    {
+      label: 'British Museum — ancient Iran',
+      href: 'https://www.britishmuseum.org/collection/galleries/ancient-iran',
+      description: 'Gallery introduction and objects',
+    },
+  ],
+  memorialNote:
+    'An upcoming Kanjava Radio session will be dedicated—original music only, published here—to honoring those who have fallen during these hard times. Details when the mix is ready.',
+} as const;
+
 export const externalLinks = [
   {
     label: 'Linktree — everything in one place',
@@ -208,6 +242,14 @@ export const kanjavaRadio = {
   statusNote:
     'Mixes are rolling out as the player and hosting pipeline land (Release 2). Follow the blog or Linktree for the first drop.',
   upcomingMixes: [
+    {
+      id: 'kr-memorial',
+      title: 'Kanjava Radio — In honor',
+      subtitle:
+        'Original session dedicated to honoring those who have fallen during these hard times. Site-exclusive when published.',
+      status: 'coming_soon' as const,
+      memorial: true as const,
+    },
     {
       id: 'kr-001',
       title: 'Kanjava Radio 001',

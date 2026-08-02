@@ -17,14 +17,14 @@ export default async function BlogPostPage({ params }: Props) {
   }
 
   return (
-    <article className="panel">
+    <article className="box content">
       <p>
         <Link href="/blog">← Blog</Link>
       </p>
       <h1>{post.title}</h1>
-      <time className="muted" dateTime={post.date}>
-        {post.date}
-      </time>
+      <p className="is-muted">
+        <time dateTime={post.date}>{post.date}</time>
+      </p>
       {post.body.map((paragraph) => (
         <p key={paragraph.slice(0, 32)}>{paragraph}</p>
       ))}

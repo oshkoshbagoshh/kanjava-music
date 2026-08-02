@@ -1,0 +1,19 @@
+@charset "utf-8";
+
+@use "palette" as p;
+
+// Bulma 1 — override derived color tokens before loading framework
+@use "bulma/sass/utilities/derived-variables" with (
+  $primary: p.$kanjava-primary,
+  $info: p.$kanjava-info,
+  $success: p.$kanjava-success,
+  $warning: p.$kanjava-warning,
+  $danger: p.$kanjava-danger,
+  $link: p.$kanjava-primary,
+  $text: p.$kanjava-text,
+  $background: p.$kanjava-panel
+);
+
+@use "bulma/sass";
+
+@use "kanjava-overrides";

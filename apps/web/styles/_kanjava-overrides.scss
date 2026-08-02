@@ -1,0 +1,97 @@
+@use "palette" as p;
+
+// Dark theme atmosphere (Bulma theme-dark + custom gradient)
+html.theme-dark {
+  --kanjava-gradient: linear-gradient(
+    160deg,
+    #{p.$kanjava-ink} 0%,
+    #2c3338 50%,
+    #1f3a36 100%
+  );
+}
+
+body.kanjava-body {
+  min-height: 100vh;
+  background: var(--kanjava-gradient);
+  color: p.$kanjava-text;
+}
+
+.kanjava-navbar {
+  backdrop-filter: blur(8px);
+  background-color: rgba(26, 29, 31, 0.92) !important;
+  border-bottom: 1px solid p.$kanjava-panel-border;
+}
+
+.kanjava-box-accent {
+  border: 1px solid p.$kanjava-success;
+  background-color: rgba(112, 174, 110, 0.08);
+}
+
+.kanjava-memorial {
+  border-left: 4px solid p.$kanjava-info;
+  padding-left: 1rem;
+}
+
+.kanjava-hero-mood {
+  font-size: 1.5rem;
+  opacity: 0.85;
+}
+
+.kanjava-tagline {
+  color: p.$kanjava-muted;
+  font-size: 0.85rem;
+  max-width: 28rem;
+}
+
+.navbar-item.is-active {
+  color: p.$kanjava-primary !important;
+}
+
+.content a {
+  color: p.$kanjava-primary;
+}
+
+.notification.is-kanjava-stub {
+  background-color: rgba(233, 196, 106, 0.12);
+  border: 1px solid p.$kanjava-warning;
+  color: p.$kanjava-text;
+}
+
+.box,
+.card {
+  background-color: p.$kanjava-panel;
+  color: p.$kanjava-text;
+  border: 1px solid p.$kanjava-panel-border;
+  border-radius: p.$kanjava-radius;
+}
+
+.title,
+.subtitle,
+.content,
+.label,
+.card-header-title {
+  color: p.$kanjava-text;
+}
+
+.subtitle.is-muted,
+.content .is-muted,
+p.is-muted {
+  color: p.$kanjava-muted !important;
+}
+
+.input,
+.textarea,
+.select select {
+  background-color: p.$kanjava-ink;
+  border-color: p.$kanjava-panel-border;
+  color: p.$kanjava-text;
+}
+
+.navbar.is-dark .navbar-item,
+.navbar.is-dark .navbar-link {
+  color: p.$kanjava-text;
+}
+
+.navbar.is-dark .navbar-item:hover {
+  background-color: rgba(255, 255, 255, 0.06);
+}

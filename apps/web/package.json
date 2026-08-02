@@ -9,9 +9,11 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "bulma": "^1.0.4",
     "next": "^15.5.0",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "sass": "^1.102.0"
   },
   "devDependencies": {
     "@types/node": "^22.10.5",

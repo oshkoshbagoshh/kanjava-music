@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { SiteHeader } from '@/components/SiteHeader';
 import { site } from '@/lib/site-content';
-import './globals.css';
+import '@/styles/main.scss';
 
 export const metadata: Metadata = {
   title: {
@@ -14,10 +14,12 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body>
+    <html lang="en" className="theme-dark" data-theme="dark">
+      <body className="kanjava-body">
         <SiteHeader />
-        <main className="layout">{children}</main>
+        <main className="section pt-4 pb-6">
+          <div className="container">{children}</div>
+        </main>
       </body>
     </html>
   );
