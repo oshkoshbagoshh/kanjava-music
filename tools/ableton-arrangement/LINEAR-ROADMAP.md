@@ -2,14 +2,14 @@
 
 ## Project brief
 
-Make the Progressive Arrangement Generator and Sine Test Instrument useful inside the Kanjava Ableton workflow. The two devices are built and separately validated. Next, test in a duplicate Kanjava Set, publish device sources in GitHub, and document the repeatable workflow.
+Make the Progressive Arrangement Generator and Sine Test Instrument useful inside the Kanjava Ableton workflow. The two devices are built and separately validated. Their sources, device files and documentation are committed to `oshkoshbagoshh/kanjava-music` on `main` (commit `5f8ca731`). Next, test in a duplicate Kanjava Set and document the repeatable workflow.
 
 ## Milestones
 
 ### Package and source control
 
 - [x] Use the existing public repository: `oshkoshbagoshh/kanjava-music`, branch `main` (`tools/ableton-arrangement/`).
-- Commit both `.amxd` files, editable Max/JavaScript sources, build scripts, product docs and suitable validation records.
+- [x] Commit both `.amxd` files, editable Max/JavaScript sources, build scripts, product docs and suitable validation records (`5f8ca731`).
 - Exclude the full Kanjava Live Set and media unless they are specifically cleared for sharing.
 
 ### Safe Kanjava integration
