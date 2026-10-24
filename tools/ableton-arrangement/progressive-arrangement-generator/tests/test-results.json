@@ -1,0 +1,10 @@
+{
+  "passed": 10,
+  "compositionCases": 576,
+  "fullDensity128Bars": {
+    "milliseconds": 1,
+    "clips": 16,
+    "notes": 2312
+  },
+  "runtimeLiveVerification": "See VALIDATION.md for actual in-app checks."
+}

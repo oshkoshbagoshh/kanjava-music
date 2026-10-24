@@ -1,0 +1,4 @@
+{
+  "passed": 4,
+  "nativeAudioRuntime": "See VALIDATION.md and validation reports; static patch tests do not prove sound."
+}

@@ -126,6 +126,10 @@ npm run dev:web
 | [docs/next-migration.md](docs/next-migration.md) | Next.js on Vercel (Release 1 stub → Release 2 plan) |
 | [docs/book/README.md](docs/book/README.md) | Building Kanjava Music — blog/eBook chapters and completion tests |
 
+## Ableton arrangement tools
+
+The companion [Progressive Arrangement Generator and Sine Test Instrument](tools/ableton-arrangement/README.md) create editable MIDI arrangements and audition them with sine tones in Ableton Live. The production Kanjava Set and generated audio are kept out of this repository.
+
 ## Phase 1 scope
 
 - Upload / browse / preview (Web Audio player)

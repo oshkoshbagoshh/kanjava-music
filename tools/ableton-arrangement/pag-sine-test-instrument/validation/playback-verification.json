@@ -1,0 +1,85 @@
+{
+  "liveVersion": "12.4.7",
+  "maxVersion": "9.1.5",
+  "unchangedMidiNotes": 5947,
+  "unchangedClips": 48,
+  "instrumentTracks": [
+    "PAG 1 Bass",
+    "PAG 1 Chords",
+    "PAG 1 Arp"
+  ],
+  "renderStartBar": 33,
+  "renderLengthBars": 4,
+  "tempo": 120,
+  "audio": {
+    "Bass": {
+      "file": "Main A stems PAG 1 Bass.wav",
+      "seconds": 8.0,
+      "sampleRate": 44100,
+      "channels": 2,
+      "peak": 0.09307861328125,
+      "peakDbFS": -20.62300191225864,
+      "rms": 0.021420102782870293,
+      "clippedSamples": 0,
+      "expectedMidiPitches": [
+        45,
+        46,
+        48,
+        51,
+        53
+      ],
+      "energyWithin8HzOfExpectedPitches": 0.9837882651993493,
+      "sha256": "139fc5e7b612beb0f25e35d681298874877e3c1e66db61c2cc2711ebe0ba29c6"
+    },
+    "Chords": {
+      "file": "Main A stems PAG 1 Chords.wav",
+      "seconds": 8.0,
+      "sampleRate": 44100,
+      "channels": 2,
+      "peak": 0.146759033203125,
+      "peakDbFS": -16.667903157718214,
+      "rms": 0.04299485185307506,
+      "clippedSamples": 0,
+      "expectedMidiPitches": [
+        57,
+        58,
+        60,
+        62,
+        65,
+        67
+      ],
+      "energyWithin8HzOfExpectedPitches": 0.9941790278419688,
+      "sha256": "98fe0082592d6a71f5c572ae5689ebf8462c543711bb49a228433373dc1e182b"
+    },
+    "Arp": {
+      "file": "Main A stems PAG 1 Arp.wav",
+      "seconds": 8.0,
+      "sampleRate": 44100,
+      "channels": 2,
+      "peak": 0.094696044921875,
+      "peakDbFS": -20.47336318751104,
+      "rms": 0.026274478125495843,
+      "clippedSamples": 0,
+      "expectedMidiPitches": [
+        67,
+        69,
+        70,
+        72,
+        74,
+        75,
+        77
+      ],
+      "energyWithin8HzOfExpectedPitches": 0.9459154484730982,
+      "sha256": "8a7f45d61eaaf506f49fc34ceaa91beea67ea12d9964c622dbeeaf59c432d029"
+    }
+  },
+  "exportedDiagnosticTrace": {
+    "noteOns": 38,
+    "noteOffs": 38,
+    "heldNotes": 0,
+    "maxHeld": 1,
+    "peak": 0.09331114144515762,
+    "audioObserved": true
+  },
+  "passed": true
+}

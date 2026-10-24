@@ -1,0 +1,55 @@
+{
+  "ok": true,
+  "live_version": "Ableton Live 12.4.7",
+  "runs": [
+    {
+      "run": 1,
+      "tracks": 3,
+      "bars": 128,
+      "clips": 16,
+      "notes_matched": 1311,
+      "start_bar": 1,
+      "seed": 1,
+      "density": 60
+    },
+    {
+      "run": 2,
+      "tracks": 3,
+      "bars": 128,
+      "clips": 16,
+      "notes_matched": 2355,
+      "start_bar": 5,
+      "seed": 2,
+      "density": 100
+    },
+    {
+      "run": 3,
+      "tracks": 3,
+      "bars": 128,
+      "clips": 16,
+      "notes_matched": 2281,
+      "start_bar": 257,
+      "seed": 16603538,
+      "density": 100
+    }
+  ],
+  "original_four_tracks_preserved": true,
+  "first_run_notes_preserved_after_second_run": true,
+  "stored_parameters": {
+    "Break bars": 4.0,
+    "Build bars": 4.0,
+    "Density %": 100.0,
+    "Intro bars": 4.0,
+    "Main A bars": 8.0,
+    "Main B bars": 8.0,
+    "Outro bars": 4.0,
+    "Progression": 0.0,
+    "Root": 7.0,
+    "Scale": 1.0,
+    "Seed": 16603538.0,
+    "Start bar": 257.0,
+    "Variation %": 35.0
+  },
+  "amxd_sha256": "4beff374bb7ff74d6406c39564322671d543767c2af7bd484fffe5d10ce6e1e2",
+  "als_sha256": "5a027f86049fd7cce3ab2f9190485fef6fba987cc2937737cf64ecd9fd829b54"
+}
